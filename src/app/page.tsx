@@ -10,7 +10,7 @@ export default function Home() {
         <div>
           <p className="text-lg font-semibold tracking-tight">Noryx</p>
           <p className="text-xs text-white/40">
-            Know exactly what you&apos;re signing.
+            Live onchain wallet security audit.
           </p>
         </div>
         <ConnectWallet />

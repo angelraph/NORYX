@@ -1,18 +1,23 @@
 "use client";
 
 import { useState } from "react";
-import { formatUnits } from "viem";
+import { formatUnits, type Address } from "viem";
 import { useConnection } from "wagmi";
 import {
   useApprovalScan,
   DEFAULT_WINDOW_BLOCKS,
   type LiveApproval,
 } from "@/hooks/use-approval-scan";
+import { useSpenderMetadata } from "@/hooks/use-spender-metadata";
 import {
   assessApprovalRisk,
   computeWalletHealth,
+  computeContractFlags,
+  riskLevelPenalty,
   UNLIMITED_THRESHOLD,
   type ApprovalRisk,
+  type SpenderMetadata,
+  type ContractFlag,
 } from "@/lib/risk";
 import { monadTestnet } from "@/lib/chains";
 import { useRevokeApproval } from "@/hooks/use-revoke-approval";
@@ -38,14 +43,21 @@ const riskStyles: Record<ApprovalRisk["level"], string> = {
   low: "border-emerald-500/30 bg-emerald-500/10 text-emerald-400",
 };
 
+const flagStyles: Record<ContractFlag["tone"], string> = {
+  warn: "border-amber-500/30 bg-amber-500/10 text-amber-300",
+  info: "border-white/10 bg-white/5 text-white/50",
+};
+
 function ApprovalRow({
   approval,
   risk,
   violatesPolicy,
+  contractFlags,
 }: {
   approval: LiveApproval;
   risk: ApprovalRisk;
   violatesPolicy: boolean;
+  contractFlags: ContractFlag[];
 }) {
   const { revoke, isPending, isConfirming, isConfirmed, error } =
     useRevokeApproval();
@@ -71,6 +83,18 @@ function ApprovalRow({
           <p className="mt-1 text-xs font-semibold text-fuchsia-400">
             Violates your saved security policy (unlimited approvals blocked).
           </p>
+        )}
+        {contractFlags.length > 0 && (
+          <div className="mt-2 flex flex-wrap gap-1.5">
+            {contractFlags.map((flag) => (
+              <span
+                key={flag.label}
+                className={`rounded-full border px-2 py-0.5 text-[11px] ${flagStyles[flag.tone]}`}
+              >
+                {flag.label}
+              </span>
+            ))}
+          </div>
         )}
         {error && (
           <p className="mt-1 text-xs text-red-400">{error.message}</p>
@@ -111,6 +135,13 @@ export function RiskReport() {
     useApprovalScan(windowBlocks);
   const { profile } = useSecurityProfile();
 
+  const approvals = data?.approvals ?? [];
+  const uniqueSpenders = Array.from(new Set(approvals.map((a) => a.spender)));
+  const { data: spenderMetadata } = useSpenderMetadata(
+    uniqueSpenders,
+    data?.scannedToBlock,
+  );
+
   if (!isConnected || chainId !== monadTestnet.id) return null;
 
   if (isLoading) {
@@ -130,14 +161,29 @@ export function RiskReport() {
     );
   }
 
-  const approvals = data?.approvals ?? [];
   const risks = approvals.map((a) =>
     assessApprovalRisk({ allowance: a.allowance, balance: a.balance }),
   );
-  const health = computeWalletHealth(risks.map((r) => r.level));
+  const contractFlagsByIndex = approvals.map((a) =>
+    computeContractFlags(
+      spenderMetadata?.get(a.spender as Address) as SpenderMetadata | undefined,
+      data?.scannedToBlock,
+    ),
+  );
+  const penalties = risks.map((r, i) => {
+    const contractPenalty = contractFlagsByIndex[i].reduce(
+      (sum, f) => sum + f.penalty,
+      0,
+    );
+    return riskLevelPenalty(r.level) + contractPenalty;
+  });
+  const health = computeWalletHealth(penalties);
   const highCount = risks.filter((r) => r.level === "high").length;
   const mediumCount = risks.filter((r) => r.level === "medium").length;
   const lowCount = approvals.length - highCount - mediumCount;
+  const contractWarnings = contractFlagsByIndex
+    .flat()
+    .filter((f) => f.tone === "warn").length;
 
   const scannedBlockSpan = data
     ? data.scannedToBlock - data.scannedFromBlock
@@ -147,12 +193,12 @@ export function RiskReport() {
   return (
     <div className="flex flex-col gap-4">
       <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-8">
-        <p className="text-sm text-white/40">Wallet Health</p>
+        <p className="text-sm text-white/40">Wallet Security Score</p>
         <p className="mt-1 text-5xl font-semibold text-white">{health}/100</p>
         <p className="mt-3 text-sm text-white/50">
           {approvals.length === 0
             ? "No active token approvals found in the scanned range."
-            : `${highCount} high risk, ${mediumCount} medium risk, ${lowCount} low risk, out of ${approvals.length} active approval${approvals.length === 1 ? "" : "s"}.`}
+            : `${highCount} high risk, ${mediumCount} medium risk, ${lowCount} low risk, out of ${approvals.length} active approval${approvals.length === 1 ? "" : "s"}${contractWarnings > 0 ? `, plus ${contractWarnings} contract-level warning${contractWarnings === 1 ? "" : "s"}` : ""}.`}
         </p>
         <p className="mt-1 text-xs text-white/30">
           Scanned the last ~{scannedBlockSpan.toString()} blocks (
@@ -168,6 +214,7 @@ export function RiskReport() {
               key={`${approval.token.address}-${approval.spender}`}
               approval={approval}
               risk={risks[i]}
+              contractFlags={contractFlagsByIndex[i]}
               violatesPolicy={
                 !!profile?.exists &&
                 profile.blockUnlimitedApprovals &&

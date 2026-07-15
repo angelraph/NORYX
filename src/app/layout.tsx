@@ -14,9 +14,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Noryx — Know exactly what you're signing",
+  title: "Noryx — Live onchain wallet security audit",
   description:
-    "Noryx scans your wallet's live token approvals on Monad, scores your risk, and lets you fix it before it costs you.",
+    "Noryx continuously audits your wallet's live approvals and permissions on Monad, explains the risk in plain English, and lets you fix it with a real transaction.",
 };
 
 export default function RootLayout({

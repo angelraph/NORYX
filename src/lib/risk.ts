@@ -47,11 +47,82 @@ export function assessApprovalRisk(params: {
   };
 }
 
-export function computeWalletHealth(risks: RiskLevel[]): number {
-  const penalty = risks.reduce((total, level) => {
-    if (level === "high") return total + 25;
-    if (level === "medium") return total + 10;
-    return total;
-  }, 0);
-  return Math.max(0, 100 - penalty);
+export function riskLevelPenalty(level: RiskLevel): number {
+  if (level === "high") return 25;
+  if (level === "medium") return 10;
+  return 0;
+}
+
+export function computeWalletHealth(penalties: number[]): number {
+  const total = penalties.reduce((sum, p) => sum + p, 0);
+  return Math.max(0, 100 - total);
+}
+
+// Contract-risk checks are kept separate from approval-amount risk on
+// purpose: they answer a different question ("is this spender itself
+// trustworthy?") from "is this approval's size safe?", and each can be
+// wrong or unknown independently of the other.
+export type SpenderMetadata = {
+  isContract: boolean;
+  isVerified: boolean | null;
+  deploymentBlock: bigint | null;
+  deploymentBlockIsFloor: boolean;
+};
+
+export type ContractFlag = {
+  label: string;
+  tone: "warn" | "info";
+  penalty: number;
+};
+
+// Roughly 14 hours at Monad's ~1s block time.
+const NEW_CONTRACT_THRESHOLD_BLOCKS = 50_000n;
+
+export function formatBlockAge(blocks: bigint): string {
+  const seconds = Number(blocks); // ~1s per block on Monad Testnet
+  if (seconds < 3600) return `~${Math.max(1, Math.round(seconds / 60))}m`;
+  if (seconds < 86400) return `~${Math.round(seconds / 3600)}h`;
+  return `~${Math.round(seconds / 86400)}d`;
+}
+
+export function computeContractFlags(
+  metadata: SpenderMetadata | undefined,
+  latestBlock: bigint | undefined,
+): ContractFlag[] {
+  if (!metadata) return [];
+  const flags: ContractFlag[] = [];
+
+  if (!metadata.isContract) {
+    flags.push({
+      label: "Spender is a wallet, not a contract",
+      tone: "warn",
+      penalty: 5,
+    });
+    return flags;
+  }
+
+  if (metadata.isVerified === true) {
+    flags.push({ label: "Verified source", tone: "info", penalty: 0 });
+  } else if (metadata.isVerified === false) {
+    flags.push({ label: "Unverified contract", tone: "warn", penalty: 5 });
+  }
+
+  if (metadata.deploymentBlock !== null && latestBlock !== undefined) {
+    const age = latestBlock - metadata.deploymentBlock;
+    if (metadata.deploymentBlockIsFloor) {
+      flags.push({
+        label: `Established contract (${formatBlockAge(age)}+ old)`,
+        tone: "info",
+        penalty: 0,
+      });
+    } else if (age < NEW_CONTRACT_THRESHOLD_BLOCKS) {
+      flags.push({
+        label: `Deployed ${formatBlockAge(age)} ago`,
+        tone: "warn",
+        penalty: 10,
+      });
+    }
+  }
+
+  return flags;
 }

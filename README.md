@@ -1,6 +1,13 @@
 # Noryx
 
-**Know exactly what you're signing.**
+**A live onchain wallet security auditor.**
+
+Noryx continuously analyzes your wallet's live approvals and permissions,
+explains the risk in plain English, and lets you fix it with a real
+blockchain transaction. It answers "what risks already exist in my wallet
+right now" — not "what will happen if I sign this," which would require
+transaction simulation infrastructure we deliberately chose not to depend
+on (see [What's not built](#whats-not-built), below).
 
 Live app: **https://noryx-lyart.vercel.app**
 Contract (Monad Testnet, verified): [`0x884EEa8281C15c3516f10Cc6864EBBaA453AF9d8`](https://testnet.monadvision.com/address/0x884EEa8281C15c3516f10Cc6864EBBaA453AF9d8)
@@ -19,23 +26,29 @@ Connect your wallet and Noryx scans your **live, current** token approvals
 on Monad Testnet — not a cached snapshot, not a mock — scores each one by
 risk, and gives you a one-click way to fix it:
 
-1. **Connect** your wallet
+1. **Connect** your wallet — scanning starts automatically, no button to click
 2. **Scan** — Noryx reads every `Approval` event your wallet has emitted
    recently across a tracked token set, then re-verifies each one against
    the *current* `allowance()` on-chain (a logged approval can already have
    been spent or replaced — only the live value is trustworthy)
-3. **Score** — a 0–100 Wallet Health score, plus a per-approval risk badge
-   (unlimited approvals are high risk; amounts far exceeding your balance
-   are medium risk)
-4. **Fix it** — a real `approve(spender, 0)` revoke transaction, one click,
+3. **Detect** — for every spender contract behind an active approval, Noryx
+   checks whether it's verified (via Sourcify), how recently it was
+   deployed (binary-searched from historical `eth_getCode`, not a claim
+   without evidence), and whether it's even a contract at all — approving
+   a plain wallet address is itself unusual
+4. **Score** — a 0–100 Wallet Security Score combining approval-amount risk
+   (unlimited is high risk; amounts far exceeding your balance are medium)
+   with the contract-level findings above
+5. **Fix it** — a real `approve(spender, 0)` revoke transaction, one click,
    right there on the row that's risky
-5. **Set your own policy** — save your approval-safety preferences
+6. **Set your own policy** — save your approval-safety preferences
    (e.g. "flag unlimited approvals") on-chain in a small `SecurityProfile`
    contract. Every scan checks your live approvals against *your own*
    saved rules, not a one-size-fits-all threshold.
 
-Nothing here is mocked. Wallet balance, approvals, risk scores, revokes,
-and saved preferences are all live reads/writes against Monad Testnet.
+Nothing here is mocked. Wallet balance, approvals, contract verification
+status, contract age, risk scores, revokes, and saved preferences are all
+live reads/writes against Monad Testnet.
 
 ## Why this, and not a generic "explain any transaction" tool
 
@@ -71,6 +84,29 @@ revoked since), so only the current on-chain state is trusted.
 Tracked tokens (USDC, WETH, WMON) are sourced from Monad's official
 token list and independently confirmed live via `eth_getCode` — see
 `src/lib/tokens.ts`.
+
+## How the contract-risk checks work
+
+For every unique spender behind an active approval, `useSpenderMetadata`
+(`src/hooks/use-spender-metadata.ts`) determines three things, all from
+primary sources rather than a maintained allowlist:
+
+- **Is it even a contract?** A plain `eth_getCode` check — approving a
+  regular wallet address, rather than a contract, is itself unusual.
+- **Is it verified?** Queried against Monad's Sourcify-compatible
+  verification API (`src/lib/sourcify.ts`) — the same service
+  `scripts/verify-contract.mjs` uses to verify our own contract.
+- **How old is it?** Binary-searched from historical `eth_getCode`
+  presence (`src/lib/contract-age.ts`) rather than guessed. The public RPC
+  only retains ~5,000,000 blocks of historical state (confirmed by testing
+  directly — older queries fail outright), so a contract older than that
+  window is reported as "established, at least this old" rather than a
+  fabricated precise age.
+
+Every RPC read in the app — the approval scan and these contract checks
+alike — shares one rate-limit-safe queue (`src/lib/rpc-utils.ts`), since
+the public RPC caps concurrent throughput at 25 requests/second and
+multiple independent hooks bursting at once would blow through that.
 
 ## The `SecurityProfile` contract
 
@@ -121,7 +157,7 @@ Foundry/Hardhat installation required:
 - `node scripts/verify-deployment.mjs` — smoke-tests the deployed
   contract's read/write behavior
 
-## What's not built (and won't be by submission)
+## What's not built
 
 - Full arbitrary-transaction simulation ("paste any calldata and see the
   before/after balances") — this needs simulation infrastructure
