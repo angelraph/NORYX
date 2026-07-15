@@ -63,7 +63,7 @@ function ScanProgress({ current }: { current: ProgressStepKey }) {
   const currentIndex = PROGRESS_STEPS.findIndex((s) => s.key === current);
 
   return (
-    <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-8">
+    <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-6 sm:p-8">
       <p className="mb-4 text-sm text-white/40">Running your wallet security audit...</p>
       <div className="flex flex-col gap-2.5">
         {PROGRESS_STEPS.map((step, i) => {
@@ -145,7 +145,7 @@ function ApprovalRow({
           <p className="mt-1 text-xs text-red-400">{error.message}</p>
         )}
       </div>
-      <div className="flex items-center gap-3">
+      <div className="flex flex-wrap items-center gap-2 sm:flex-nowrap sm:gap-3">
         <span className="font-mono text-sm text-white/80">
           {formatAmount(approval.allowance, approval.token.decimals)}{" "}
           {approval.token.symbol}
@@ -158,7 +158,7 @@ function ApprovalRow({
         <button
           onClick={() => revoke(approval.token.address, approval.spender)}
           disabled={busy || isConfirmed}
-          className="rounded-full border border-white/10 px-3 py-1.5 text-xs font-semibold text-white/70 transition hover:border-red-400/50 hover:text-red-300 disabled:opacity-50"
+          className="shrink-0 rounded-full border border-white/10 px-3 py-1.5 text-xs font-semibold text-white/70 transition hover:border-red-400/50 hover:text-red-300 disabled:opacity-50"
         >
           {isConfirmed
             ? "Revoked"
@@ -198,7 +198,7 @@ export function RiskReport() {
 
   if (isError) {
     return (
-      <div className="rounded-2xl border border-red-500/30 bg-red-500/10 p-8 text-center text-red-400">
+      <div className="rounded-2xl border border-red-500/30 bg-red-500/10 p-6 text-center text-red-400 sm:p-8">
         Failed to scan approvals:{" "}
         {error instanceof Error ? error.message : "unknown error"}
       </div>
@@ -236,7 +236,7 @@ export function RiskReport() {
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-8">
+      <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-6 sm:p-8">
         <p className="text-sm text-white/40">Wallet Security Score</p>
         <p className="mt-1 text-5xl font-semibold text-white">{health}/100</p>
         <p className="mt-3 text-sm text-white/50">

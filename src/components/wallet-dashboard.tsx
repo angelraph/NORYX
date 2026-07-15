@@ -20,7 +20,7 @@ export function WalletDashboard() {
 
   if (!isConnected) {
     return (
-      <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-8 text-center text-white/50">
+      <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-6 text-center text-white/50 sm:p-8">
         Connect your wallet to see your live balance on Monad Testnet.
       </div>
     );
@@ -30,7 +30,7 @@ export function WalletDashboard() {
 
   if (onWrongChain) {
     return (
-      <div className="flex flex-col items-center gap-4 rounded-2xl border border-amber-500/30 bg-amber-500/10 p-8 text-center">
+      <div className="flex flex-col items-center gap-4 rounded-2xl border border-amber-500/30 bg-amber-500/10 p-6 text-center sm:p-8">
         <p className="text-amber-300">
           You&apos;re connected to chain {chainId}. Noryx reads live data from
           Monad Testnet.
@@ -47,7 +47,7 @@ export function WalletDashboard() {
   }
 
   return (
-    <div className="grid gap-4 rounded-2xl border border-white/10 bg-white/[0.02] p-8 sm:grid-cols-2">
+    <div className="grid gap-4 rounded-2xl border border-white/10 bg-white/[0.02] p-6 sm:grid-cols-2 sm:p-8">
       <div>
         <p className="text-sm text-white/40">Wallet</p>
         <p className="mt-1 break-all font-mono text-sm text-white">

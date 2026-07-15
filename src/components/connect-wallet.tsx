@@ -29,8 +29,8 @@ export function ConnectWallet() {
   }
 
   return (
-    <div className="flex flex-col items-end gap-2">
-      <div className="flex flex-wrap justify-end gap-2">
+    <div className="flex flex-col items-start gap-2 sm:items-end">
+      <div className="flex flex-wrap gap-2 sm:justify-end">
         {connectors.map((connector) => (
           <button
             key={connector.uid}
@@ -43,7 +43,7 @@ export function ConnectWallet() {
         ))}
       </div>
       {error && (
-        <p className="max-w-xs text-right text-xs text-red-400">
+        <p className="max-w-xs text-xs text-red-400 sm:text-right">
           {error.message}
         </p>
       )}
