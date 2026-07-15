@@ -1,5 +1,6 @@
 import { ConnectWallet } from "@/components/connect-wallet";
 import { WalletDashboard } from "@/components/wallet-dashboard";
+import { SecurityProfileCard } from "@/components/security-profile-card";
 import { RiskReport } from "@/components/risk-report";
 import { DevApprovalTool } from "@/components/dev-approval-tool";
 
@@ -18,6 +19,7 @@ export default function Home() {
 
       <main className="mx-auto flex w-full max-w-3xl flex-1 flex-col gap-6 px-6 py-12 sm:px-10">
         <WalletDashboard />
+        <SecurityProfileCard />
         <RiskReport />
         <DevApprovalTool />
       </main>

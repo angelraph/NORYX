@@ -1,0 +1,93 @@
+{
+  "abi": [
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "user",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "bool",
+          "name": "blockUnlimitedApprovals",
+          "type": "bool"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "maxApprovalAmount",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "bool",
+          "name": "warnNewContracts",
+          "type": "bool"
+        }
+      ],
+      "name": "PreferencesSaved",
+      "type": "event"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "user",
+          "type": "address"
+        }
+      ],
+      "name": "getPreferences",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "blockUnlimitedApprovals",
+          "type": "bool"
+        },
+        {
+          "internalType": "uint256",
+          "name": "maxApprovalAmount",
+          "type": "uint256"
+        },
+        {
+          "internalType": "bool",
+          "name": "warnNewContracts",
+          "type": "bool"
+        },
+        {
+          "internalType": "bool",
+          "name": "exists",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bool",
+          "name": "blockUnlimitedApprovals",
+          "type": "bool"
+        },
+        {
+          "internalType": "uint256",
+          "name": "maxApprovalAmount",
+          "type": "uint256"
+        },
+        {
+          "internalType": "bool",
+          "name": "warnNewContracts",
+          "type": "bool"
+        }
+      ],
+      "name": "savePreferences",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    }
+  ],
+  "bytecode": "0x608060405234801561000f575f80fd5b5061024c8061001d5f395ff3fe608060405234801561000f575f80fd5b5060043610610034575f3560e01c806306c7a2361461003857806311398d2b146100cf575b5f80fd5b6100a561004636600461019c565b6001600160a01b03165f90815260208181526040918290208251608081018452815460ff908116151580835260018401549483018590526002909301548082161515958301869052610100900416151560609091018190529093919291565b60408051941515855260208501939093529015158383015215156060830152519081900360800190f35b6100e26100dd3660046101dd565b6100e4565b005b60408051608081018252841515808252602080830186815285151584860181815260016060808801828152335f8181528089528b902099518a5460ff1916901515178a55955192890192909255915160029097018054915161ffff1990921697151561ff0019169790971761010091151591909102179095558551938452918301879052938201527ffab946724155a91f3162444c254500c8488ab7e70743b6c50282dbb12d4bf0cf910160405180910390a2505050565b5f602082840312156101ac575f80fd5b81356001600160a01b03811681146101c2575f80fd5b9392505050565b803580151581146101d8575f80fd5b919050565b5f805f606084860312156101ef575f80fd5b6101f8846101c9565b92506020840135915061020d604085016101c9565b9050925092509256fea2646970667358221220992ce3ec6a49843903ffd29b40a6f148fbaa24e4d080f7d6cb9f66eeb1bf301664736f6c63430008180033"
+}

@@ -16,6 +16,7 @@ import {
 } from "@/lib/risk";
 import { monadTestnet } from "@/lib/chains";
 import { useRevokeApproval } from "@/hooks/use-revoke-approval";
+import { useSecurityProfile } from "@/hooks/use-security-profile";
 
 const MAX_WINDOW_BLOCKS = 60_000n;
 const TRACKED_SYMBOLS = "USDC, WETH, WMON";
@@ -40,9 +41,11 @@ const riskStyles: Record<ApprovalRisk["level"], string> = {
 function ApprovalRow({
   approval,
   risk,
+  violatesPolicy,
 }: {
   approval: LiveApproval;
   risk: ApprovalRisk;
+  violatesPolicy: boolean;
 }) {
   const { revoke, isPending, isConfirming, isConfirmed, error } =
     useRevokeApproval();
@@ -64,6 +67,11 @@ function ApprovalRow({
           </a>
         </p>
         <p className="mt-1 text-sm text-white/50">{risk.reasons[0]}</p>
+        {violatesPolicy && (
+          <p className="mt-1 text-xs font-semibold text-fuchsia-400">
+            Violates your saved security policy (unlimited approvals blocked).
+          </p>
+        )}
         {error && (
           <p className="mt-1 text-xs text-red-400">{error.message}</p>
         )}
@@ -101,6 +109,7 @@ export function RiskReport() {
   const [windowBlocks, setWindowBlocks] = useState(DEFAULT_WINDOW_BLOCKS);
   const { data, isLoading, isFetching, isError, error } =
     useApprovalScan(windowBlocks);
+  const { profile } = useSecurityProfile();
 
   if (!isConnected || chainId !== monadTestnet.id) return null;
 
@@ -159,6 +168,11 @@ export function RiskReport() {
               key={`${approval.token.address}-${approval.spender}`}
               approval={approval}
               risk={risks[i]}
+              violatesPolicy={
+                !!profile?.exists &&
+                profile.blockUnlimitedApprovals &&
+                approval.allowance >= UNLIMITED_THRESHOLD
+              }
             />
           ))}
         </div>
