@@ -15,6 +15,7 @@ import {
   type ApprovalRisk,
 } from "@/lib/risk";
 import { monadTestnet } from "@/lib/chains";
+import { useRevokeApproval } from "@/hooks/use-revoke-approval";
 
 const MAX_WINDOW_BLOCKS = 60_000n;
 const TRACKED_SYMBOLS = "USDC, WETH, WMON";
@@ -43,6 +44,10 @@ function ApprovalRow({
   approval: LiveApproval;
   risk: ApprovalRisk;
 }) {
+  const { revoke, isPending, isConfirming, isConfirmed, error } =
+    useRevokeApproval();
+  const busy = isPending || isConfirming;
+
   return (
     <div className="flex flex-col gap-2 rounded-xl border border-white/10 bg-white/[0.02] p-4 sm:flex-row sm:items-center sm:justify-between">
       <div className="min-w-0">
@@ -59,6 +64,9 @@ function ApprovalRow({
           </a>
         </p>
         <p className="mt-1 text-sm text-white/50">{risk.reasons[0]}</p>
+        {error && (
+          <p className="mt-1 text-xs text-red-400">{error.message}</p>
+        )}
       </div>
       <div className="flex items-center gap-3">
         <span className="font-mono text-sm text-white/80">
@@ -70,6 +78,19 @@ function ApprovalRow({
         >
           {risk.level}
         </span>
+        <button
+          onClick={() => revoke(approval.token.address, approval.spender)}
+          disabled={busy || isConfirmed}
+          className="rounded-full border border-white/10 px-3 py-1.5 text-xs font-semibold text-white/70 transition hover:border-red-400/50 hover:text-red-300 disabled:opacity-50"
+        >
+          {isConfirmed
+            ? "Revoked"
+            : isConfirming
+              ? "Confirming..."
+              : isPending
+                ? "Confirm in wallet..."
+                : "Revoke"}
+        </button>
       </div>
     </div>
   );
