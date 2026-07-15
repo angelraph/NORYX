@@ -48,6 +48,51 @@ const flagStyles: Record<ContractFlag["tone"], string> = {
   info: "border-white/10 bg-white/5 text-white/50",
 };
 
+// Each step here is gated on a real async phase actually completing
+// (see useApprovalScan's ScanStage and useSpenderMetadata's isLoading) —
+// not a timer standing in for work that isn't really happening.
+const PROGRESS_STEPS = [
+  { key: "loading-approvals", label: "Reading wallet approvals" },
+  { key: "checking-allowances", label: "Verifying live allowances" },
+  { key: "auditing-contracts", label: "Auditing spender contracts" },
+] as const;
+
+type ProgressStepKey = (typeof PROGRESS_STEPS)[number]["key"];
+
+function ScanProgress({ current }: { current: ProgressStepKey }) {
+  const currentIndex = PROGRESS_STEPS.findIndex((s) => s.key === current);
+
+  return (
+    <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-8">
+      <p className="mb-4 text-sm text-white/40">Running your wallet security audit...</p>
+      <div className="flex flex-col gap-2.5">
+        {PROGRESS_STEPS.map((step, i) => {
+          const done = i < currentIndex;
+          const active = i === currentIndex;
+          return (
+            <div key={step.key} className="flex items-center gap-2.5 text-sm">
+              <span
+                className={
+                  done
+                    ? "text-emerald-400"
+                    : active
+                      ? "animate-pulse text-white"
+                      : "text-white/20"
+                }
+              >
+                {done ? "✓" : active ? "●" : "○"}
+              </span>
+              <span className={done || active ? "text-white/80" : "text-white/30"}>
+                {step.label}
+              </span>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
 function ApprovalRow({
   approval,
   risk,
@@ -131,25 +176,24 @@ function ApprovalRow({
 export function RiskReport() {
   const { isConnected, chainId } = useConnection();
   const [windowBlocks, setWindowBlocks] = useState(DEFAULT_WINDOW_BLOCKS);
-  const { data, isLoading, isFetching, isError, error } =
+  const { data, isLoading, isFetching, isError, error, stage } =
     useApprovalScan(windowBlocks);
   const { profile } = useSecurityProfile();
 
   const approvals = data?.approvals ?? [];
   const uniqueSpenders = Array.from(new Set(approvals.map((a) => a.spender)));
-  const { data: spenderMetadata } = useSpenderMetadata(
-    uniqueSpenders,
-    data?.scannedToBlock,
-  );
+  const { data: spenderMetadata, isLoading: isLoadingSpenderMetadata } =
+    useSpenderMetadata(uniqueSpenders, data?.scannedToBlock);
 
   if (!isConnected || chainId !== monadTestnet.id) return null;
 
-  if (isLoading) {
-    return (
-      <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-8 text-center text-white/50">
-        Scanning live approvals on Monad Testnet...
-      </div>
-    );
+  const isAuditingContracts = approvals.length > 0 && isLoadingSpenderMetadata;
+
+  if (isLoading || isAuditingContracts) {
+    const current: ProgressStepKey = isLoading
+      ? (stage as ProgressStepKey)
+      : "auditing-contracts";
+    return <ScanProgress current={current} />;
   }
 
   if (isError) {

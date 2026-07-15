@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useConnection, usePublicClient } from "wagmi";
 import type { Address, PublicClient } from "viem";
@@ -7,6 +8,11 @@ import { TRACKED_TOKENS, type TrackedToken } from "@/lib/tokens";
 import { erc20Abi } from "@/lib/erc20-abi";
 import { monadTestnet } from "@/lib/chains";
 import { rpcCall } from "@/lib/rpc-utils";
+
+// Reflects real phase transitions inside queryFn below — not a simulated
+// timer. Read by RiskReport to show which stage of the audit is actually
+// in flight right now.
+export type ScanStage = "loading-approvals" | "checking-allowances" | "done";
 
 // The public Monad Testnet RPC caps eth_getLogs to a 100-block range per
 // call, so historical scanning has to run in bounded chunks. Every chunk
@@ -48,15 +54,17 @@ function buildChunkTasks(fromBlock: bigint, toBlock: bigint): ChunkTask[] {
 export function useApprovalScan(windowBlocks: bigint = DEFAULT_WINDOW_BLOCKS) {
   const { address, isConnected, chainId } = useConnection();
   const publicClient = usePublicClient({ chainId: monadTestnet.id });
+  const [stage, setStage] = useState<ScanStage>("loading-approvals");
 
   const enabled =
     isConnected && !!address && chainId === monadTestnet.id && !!publicClient;
 
-  return useQuery({
+  const query = useQuery({
     queryKey: ["approval-scan", address, windowBlocks.toString()],
     enabled,
     staleTime: 30_000,
     queryFn: async () => {
+      setStage("loading-approvals");
       const client = publicClient as PublicClient;
       const owner = address as Address;
 
@@ -94,6 +102,7 @@ export function useApprovalScan(windowBlocks: bigint = DEFAULT_WINDOW_BLOCKS) {
         }
       });
 
+      setStage("checking-allowances");
       const balanceResults = await rpcCall(() =>
         client.multicall({
           contracts: TRACKED_TOKENS.map((token) => ({
@@ -116,6 +125,7 @@ export function useApprovalScan(windowBlocks: bigint = DEFAULT_WINDOW_BLOCKS) {
       });
 
       if (pairs.length === 0) {
+        setStage("done");
         return {
           approvals: [] as LiveApproval[],
           scannedFromBlock: fromBlock,
@@ -153,6 +163,7 @@ export function useApprovalScan(windowBlocks: bigint = DEFAULT_WINDOW_BLOCKS) {
         });
       });
 
+      setStage("done");
       return {
         approvals,
         scannedFromBlock: fromBlock,
@@ -164,4 +175,6 @@ export function useApprovalScan(windowBlocks: bigint = DEFAULT_WINDOW_BLOCKS) {
       };
     },
   });
+
+  return { ...query, stage: query.isFetching ? stage : "done" as ScanStage };
 }
