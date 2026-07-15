@@ -2,7 +2,6 @@ import { ConnectWallet } from "@/components/connect-wallet";
 import { WalletDashboard } from "@/components/wallet-dashboard";
 import { SecurityProfileCard } from "@/components/security-profile-card";
 import { RiskReport } from "@/components/risk-report";
-import { DevApprovalTool } from "@/components/dev-approval-tool";
 
 export default function Home() {
   return (
@@ -21,7 +20,6 @@ export default function Home() {
         <WalletDashboard />
         <SecurityProfileCard />
         <RiskReport />
-        <DevApprovalTool />
       </main>
     </div>
   );
