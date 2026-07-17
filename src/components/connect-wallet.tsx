@@ -58,7 +58,7 @@ export function ConnectWallet() {
   }
 
   return (
-    <div ref={panelRef} className="relative flex flex-col items-start gap-2 sm:items-end">
+    <div ref={panelRef} className="relative flex flex-col items-end gap-2">
       <button
         onClick={() => setIsOpen((o) => !o)}
         disabled={isPending}
@@ -68,7 +68,7 @@ export function ConnectWallet() {
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 top-full z-10 mt-2 w-56 overflow-hidden rounded-2xl border border-white/10 bg-black shadow-xl shadow-black/50">
+        <div className="absolute right-0 top-full z-10 mt-2 w-56 max-w-[calc(100vw-2rem)] overflow-hidden rounded-2xl border border-white/10 bg-black shadow-xl shadow-black/50">
           {uniqueConnectors.length === 0 ? (
             <p className="px-4 py-3 text-sm text-white/40">
               No wallet extensions detected.
@@ -96,7 +96,7 @@ export function ConnectWallet() {
       )}
 
       {error && (
-        <p className="max-w-xs text-xs text-red-400 sm:text-right">
+        <p className="max-w-xs text-right text-xs text-red-400">
           {error.message}
         </p>
       )}
