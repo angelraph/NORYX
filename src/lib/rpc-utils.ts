@@ -16,23 +16,35 @@ function sleep(ms: number) {
 }
 
 let active = 0;
-const queue: Array<() => void> = [];
+// Two priority lanes on one semaphore: background work (the approval scan's
+// auto-deepening past the first fast pass) can legitimately queue hundreds
+// of requests at once. Without this split, that flood sits in front of
+// foreground requests (contract metadata, balances, a user-initiated
+// action) in strict FIFO order and starves the UI from ever leaving its
+// loading state, even though the data it actually needs already came back.
+const highQueue: Array<() => void> = [];
+const lowQueue: Array<() => void> = [];
 
-async function acquire() {
+async function acquire(priority: "high" | "low") {
   if (active >= GLOBAL_CONCURRENCY) {
-    await new Promise<void>((resolve) => queue.push(resolve));
+    await new Promise<void>((resolve) => {
+      (priority === "high" ? highQueue : lowQueue).push(resolve);
+    });
   }
   active++;
 }
 
 function release() {
   active--;
-  const next = queue.shift();
+  const next = highQueue.shift() ?? lowQueue.shift();
   if (next) next();
 }
 
-export async function rpcCall<T>(fn: () => Promise<T>): Promise<T> {
-  await acquire();
+export async function rpcCall<T>(
+  fn: () => Promise<T>,
+  priority: "high" | "low" = "high",
+): Promise<T> {
+  await acquire(priority);
   try {
     for (let attempt = 0; ; attempt++) {
       try {

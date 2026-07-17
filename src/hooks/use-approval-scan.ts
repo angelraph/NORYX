@@ -106,7 +106,12 @@ export function useApprovalScan() {
     isConnected && !!address && chainId === monadTestnet.id && !!publicClient;
 
   const runSlice = useCallback(
-    async (generation: number, sliceFromBlock: bigint, sliceToBlock: bigint) => {
+    async (
+      generation: number,
+      sliceFromBlock: bigint,
+      sliceToBlock: bigint,
+      priority: "high" | "low" = "high",
+    ) => {
       const session = sessionRef.current;
       if (!session || generation !== generationRef.current) return;
       if (sliceFromBlock > sliceToBlock) return;
@@ -114,14 +119,16 @@ export function useApprovalScan() {
       const chunkTasks = buildChunkTasks(sliceFromBlock, sliceToBlock);
       const chunkResults = await Promise.all(
         chunkTasks.map((c) =>
-          rpcCall(() =>
-            session.client.getLogs({
-              address: c.token.address,
-              event: approvalEventAbi,
-              args: { owner: session.owner },
-              fromBlock: c.fromBlock,
-              toBlock: c.toBlock,
-            }),
+          rpcCall(
+            () =>
+              session.client.getLogs({
+                address: c.token.address,
+                event: approvalEventAbi,
+                args: { owner: session.owner },
+                fromBlock: c.fromBlock,
+                toBlock: c.toBlock,
+              }),
+            priority,
           ),
         ),
       );
@@ -140,16 +147,18 @@ export function useApprovalScan() {
       });
 
       if (newPairs.length > 0) {
-        const allowanceResults = await rpcCall(() =>
-          session.client.multicall({
-            contracts: newPairs.map(({ token, spender }) => ({
-              address: token.address,
-              abi: erc20Abi,
-              functionName: "allowance" as const,
-              args: [session.owner, spender] as const,
-            })),
-            allowFailure: true,
-          }),
+        const allowanceResults = await rpcCall(
+          () =>
+            session.client.multicall({
+              contracts: newPairs.map(({ token, spender }) => ({
+                address: token.address,
+                abi: erc20Abi,
+                functionName: "allowance" as const,
+                args: [session.owner, spender] as const,
+              })),
+              allowFailure: true,
+            }),
+          priority,
         );
         if (generation !== generationRef.current) return;
 
@@ -230,7 +239,7 @@ export function useApprovalScan() {
         const fastFromBlock = latest - windowBlocks;
 
         setState((s) => ({ ...s, stage: "checking-allowances" }));
-        await runSlice(generation, fastFromBlock, latest);
+        await runSlice(generation, fastFromBlock, latest, "high");
         if (generation !== generationRef.current) return;
         coveredFromBlock = fastFromBlock;
 
@@ -261,7 +270,7 @@ export function useApprovalScan() {
           const sliceTo = coveredFromBlock - 1n;
 
           if (nextFromBlock < coveredFromBlock) {
-            await runSlice(generation, nextFromBlock, sliceTo);
+            await runSlice(generation, nextFromBlock, sliceTo, "low");
             if (generation !== generationRef.current) return;
           }
 
@@ -313,7 +322,7 @@ export function useApprovalScan() {
     const sliceTo = state.scannedFromBlock - 1n;
 
     if (nextFromBlock < state.scannedFromBlock) {
-      await runSlice(generation, nextFromBlock, sliceTo);
+      await runSlice(generation, nextFromBlock, sliceTo, "high");
       if (generation !== generationRef.current) return;
     }
 
