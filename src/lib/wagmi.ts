@@ -1,10 +1,14 @@
 import { createConfig, http } from "wagmi";
-import { injected } from "wagmi/connectors";
+import { coinbaseWallet, injected, metaMask } from "wagmi/connectors";
 import { monadTestnet } from "./chains";
 
 export const wagmiConfig = createConfig({
   chains: [monadTestnet],
-  connectors: [injected()],
+  connectors: [
+    injected(),
+    metaMask(),
+    coinbaseWallet({ appName: "Noryx" }),
+  ],
   transports: {
     [monadTestnet.id]: http(),
   },

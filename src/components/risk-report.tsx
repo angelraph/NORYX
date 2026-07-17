@@ -1,19 +1,15 @@
 "use client";
 
-import { useState } from "react";
 import { formatUnits, type Address } from "viem";
 import { useConnection } from "wagmi";
-import {
-  useApprovalScan,
-  DEFAULT_WINDOW_BLOCKS,
-  type LiveApproval,
-} from "@/hooks/use-approval-scan";
+import { useApprovalScan, type LiveApproval } from "@/hooks/use-approval-scan";
 import { useSpenderMetadata } from "@/hooks/use-spender-metadata";
 import {
   assessApprovalRisk,
   computeWalletHealth,
   computeContractFlags,
   riskLevelPenalty,
+  formatBlockAge,
   UNLIMITED_THRESHOLD,
   type ApprovalRisk,
   type SpenderMetadata,
@@ -23,7 +19,6 @@ import { monadTestnet } from "@/lib/chains";
 import { useRevokeApproval } from "@/hooks/use-revoke-approval";
 import { useSecurityProfile } from "@/hooks/use-security-profile";
 
-const MAX_WINDOW_BLOCKS = 60_000n;
 const TRACKED_SYMBOLS = "USDC, WETH, WMON";
 
 function shortenAddress(address: string) {
@@ -175,15 +170,23 @@ function ApprovalRow({
 
 export function RiskReport() {
   const { isConnected, chainId } = useConnection();
-  const [windowBlocks, setWindowBlocks] = useState(DEFAULT_WINDOW_BLOCKS);
-  const { data, isLoading, isFetching, isError, error, stage } =
-    useApprovalScan(windowBlocks);
+  const {
+    approvals,
+    scannedFromBlock,
+    scannedToBlock,
+    isLoading,
+    isScanningDeeper,
+    isError,
+    error,
+    stage,
+    canScanFurther,
+    scanFurther,
+  } = useApprovalScan();
   const { profile } = useSecurityProfile();
 
-  const approvals = data?.approvals ?? [];
   const uniqueSpenders = Array.from(new Set(approvals.map((a) => a.spender)));
   const { data: spenderMetadata, isLoading: isLoadingSpenderMetadata } =
-    useSpenderMetadata(uniqueSpenders, data?.scannedToBlock);
+    useSpenderMetadata(uniqueSpenders, scannedToBlock);
 
   if (!isConnected || chainId !== monadTestnet.id) return null;
 
@@ -211,7 +214,7 @@ export function RiskReport() {
   const contractFlagsByIndex = approvals.map((a) =>
     computeContractFlags(
       spenderMetadata?.get(a.spender as Address) as SpenderMetadata | undefined,
-      data?.scannedToBlock,
+      scannedToBlock,
     ),
   );
   const penalties = risks.map((r, i) => {
@@ -229,10 +232,7 @@ export function RiskReport() {
     .flat()
     .filter((f) => f.tone === "warn").length;
 
-  const scannedBlockSpan = data
-    ? data.scannedToBlock - data.scannedFromBlock
-    : 0n;
-  const canScanFurther = windowBlocks < MAX_WINDOW_BLOCKS;
+  const scannedBlockSpan = scannedToBlock - scannedFromBlock;
 
   return (
     <div className="flex flex-col gap-4">
@@ -245,9 +245,10 @@ export function RiskReport() {
             : `${highCount} high risk, ${mediumCount} medium risk, ${lowCount} low risk, out of ${approvals.length} active approval${approvals.length === 1 ? "" : "s"}${contractWarnings > 0 ? `, plus ${contractWarnings} contract-level warning${contractWarnings === 1 ? "" : "s"}` : ""}.`}
         </p>
         <p className="mt-1 text-xs text-white/30">
-          Scanned the last ~{scannedBlockSpan.toString()} blocks (
-          {TRACKED_SYMBOLS}) on Monad Testnet — live on every load, nothing
-          cached or mocked.
+          Scanned the last ~{formatBlockAge(scannedBlockSpan)} ({TRACKED_SYMBOLS})
+          on Monad Testnet — live on every load, nothing cached or mocked.
+          {isScanningDeeper &&
+            " Still checking further back automatically — score may update as older approvals are found."}
         </p>
       </div>
 
@@ -271,15 +272,11 @@ export function RiskReport() {
 
       {canScanFurther && (
         <button
-          onClick={() =>
-            setWindowBlocks((w) =>
-              w * 3n > MAX_WINDOW_BLOCKS ? MAX_WINDOW_BLOCKS : w * 3n,
-            )
-          }
-          disabled={isFetching}
+          onClick={() => scanFurther()}
+          disabled={isScanningDeeper}
           className="self-start rounded-full border border-white/10 px-4 py-2 text-sm text-white/60 transition hover:border-white/30 hover:text-white disabled:opacity-50"
         >
-          {isFetching ? "Scanning..." : "Scan further back"}
+          {isScanningDeeper ? "Scanning..." : "Scan even further back"}
         </button>
       )}
     </div>
