@@ -43,9 +43,9 @@ const flagStyles: Record<ContractFlag["tone"], string> = {
   info: "border-white/10 bg-white/5 text-white/50",
 };
 
-// Each step here is gated on a real async phase actually completing
-// (see useApprovalScan's ScanStage and useSpenderMetadata's isLoading) —
-// not a timer standing in for work that isn't really happening.
+// Each step here is gated on a real async phase actually completing (see
+// useApprovalScan's ScanStage and useSpenderMetadata's isLoading), not a
+// timer standing in for work that isn't really happening.
 const PROGRESS_STEPS = [
   { key: "loading-approvals", label: "Reading wallet approvals" },
   { key: "checking-allowances", label: "Verifying live allowances" },
@@ -58,31 +58,35 @@ function ScanProgress({ current }: { current: ProgressStepKey }) {
   const currentIndex = PROGRESS_STEPS.findIndex((s) => s.key === current);
 
   return (
-    <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-6 sm:p-8">
-      <p className="mb-4 text-sm text-white/40">Running your wallet security audit...</p>
-      <div className="flex flex-col gap-2.5">
-        {PROGRESS_STEPS.map((step, i) => {
-          const done = i < currentIndex;
-          const active = i === currentIndex;
-          return (
-            <div key={step.key} className="flex items-center gap-2.5 text-sm">
-              <span
-                className={
-                  done
-                    ? "text-emerald-400"
-                    : active
-                      ? "animate-pulse text-white"
-                      : "text-white/20"
-                }
-              >
-                {done ? "✓" : active ? "●" : "○"}
-              </span>
-              <span className={done || active ? "text-white/80" : "text-white/30"}>
-                {step.label}
-              </span>
-            </div>
-          );
-        })}
+    <div className="rounded-2xl bg-linear-to-r from-violet-500/40 to-cyan-400/40 p-px">
+      <div className="rounded-[15px] bg-black p-6 sm:p-8">
+        <p className="font-display mb-4 bg-linear-to-r from-violet-400 to-cyan-300 bg-clip-text text-sm text-transparent">
+          Running your wallet security audit...
+        </p>
+        <div className="flex flex-col gap-2.5">
+          {PROGRESS_STEPS.map((step, i) => {
+            const done = i < currentIndex;
+            const active = i === currentIndex;
+            return (
+              <div key={step.key} className="flex items-center gap-2.5 text-sm">
+                <span
+                  className={
+                    done
+                      ? "text-cyan-400"
+                      : active
+                        ? "animate-pulse bg-linear-to-r from-violet-400 to-cyan-300 bg-clip-text text-transparent"
+                        : "text-white/20"
+                  }
+                >
+                  {done ? "✓" : active ? "●" : "○"}
+                </span>
+                <span className={done || active ? "text-white/80" : "text-white/30"}>
+                  {step.label}
+                </span>
+              </div>
+            );
+          })}
+        </div>
       </div>
     </div>
   );
@@ -238,7 +242,9 @@ export function RiskReport() {
     <div className="flex flex-col gap-4">
       <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-6 sm:p-8">
         <p className="text-sm text-white/40">Wallet Security Score</p>
-        <p className="mt-1 text-5xl font-semibold text-white">{health}/100</p>
+        <p className="font-display mt-1 text-5xl font-semibold text-white">
+          {health}/100
+        </p>
         <p className="mt-3 text-sm text-white/50">
           {approvals.length === 0
             ? "No active token approvals found in the scanned range."
@@ -246,9 +252,9 @@ export function RiskReport() {
         </p>
         <p className="mt-1 text-xs text-white/30">
           Scanned the last ~{formatBlockAge(scannedBlockSpan)} ({TRACKED_SYMBOLS})
-          on Monad Testnet — live on every load, nothing cached or mocked.
+          on Monad Testnet. Live on every load, nothing cached or mocked.
           {isScanningDeeper &&
-            " Still checking further back automatically — score may update as older approvals are found."}
+            " Still checking further back automatically: score may update as older approvals are found."}
         </p>
       </div>
 

@@ -1,7 +1,7 @@
 const PREREQUISITES = [
   {
     title: "A wallet browser extension",
-    body: "MetaMask, Coinbase Wallet, and Phantom all work — Noryx detects whichever you have installed.",
+    body: "MetaMask, Coinbase Wallet, and Phantom all work. Noryx detects whichever you have installed.",
   },
   {
     title: "A little free testnet MON",
@@ -16,15 +16,15 @@ const PREREQUISITES = [
 const STEPS = [
   {
     title: "Connect",
-    body: "Click \"Connect Wallet\" in the top right and pick your wallet from the list. Noryx starts scanning the moment you're connected — there's no extra button to press.",
+    body: "Click \"Connect Wallet\" in the top right and pick your wallet from the list. Noryx starts scanning the moment you're connected, with no extra button to press.",
   },
   {
     title: "Scan",
-    body: "An \"approval\" is a permission you once gave a smart contract to move a specific token out of your wallet — sometimes with no limit. Noryx looks back through your wallet's history for every approval you've ever granted, tracked across a set of common tokens.",
+    body: "An \"approval\" is a permission you once gave a smart contract to move a specific token out of your wallet, sometimes with no limit. Noryx looks back through your wallet's history for every approval you've ever granted, tracked across a set of common tokens.",
   },
   {
     title: "Verify",
-    body: "A logged approval can already be stale — spent, replaced, or cancelled since. Noryx double-checks each one against what's actually still active on your wallet right now, so you only ever see approvals that are really live.",
+    body: "A logged approval can already be stale: spent, replaced, or cancelled since. Noryx double-checks each one against what's actually still active on your wallet right now, so you only ever see approvals that are really live.",
   },
   {
     title: "Detect",
@@ -36,11 +36,11 @@ const STEPS = [
   },
   {
     title: "Fix it",
-    body: "Found something risky? Click \"Revoke\" right on that row. It's a real transaction on Monad Testnet that cancels the permission for good — that contract can never move your tokens again.",
+    body: "Found something risky? Click \"Revoke\" right on that row. It's a real transaction on Monad Testnet that cancels the permission for good, so that contract can never move your tokens again.",
   },
   {
     title: "Set your own policy",
-    body: "Decide what counts as \"risky\" for you — for example, always flag unlimited approvals — and save it on-chain. Every future scan checks against your own saved rules, not a generic one-size-fits-all threshold.",
+    body: "Decide what counts as \"risky\" for you, for example always flag unlimited approvals, and save it on-chain. Every future scan checks against your own saved rules, not a generic one-size-fits-all threshold.",
   },
 ] as const;
 
@@ -58,7 +58,7 @@ export function LandingHero() {
 
       <div className="relative flex flex-col items-start gap-4">
         <div className="flex flex-col gap-4">
-          <h1 className="bg-linear-to-r from-violet-400 to-cyan-300 bg-clip-text text-3xl font-semibold tracking-tight text-transparent sm:text-5xl">
+          <h1 className="font-display bg-linear-to-r from-violet-400 to-cyan-300 bg-clip-text text-3xl font-semibold tracking-tight text-transparent sm:text-5xl">
             Know exactly what your wallet has approved.
           </h1>
           <p className="max-w-xl text-base text-white/50 sm:text-lg">
@@ -71,17 +71,18 @@ export function LandingHero() {
         </div>
         <p className="text-sm font-medium text-cyan-300">
           New here? Tap &ldquo;Connect Wallet&rdquo; in the top right to get
-          started — the walkthrough below explains exactly what happens next.
+          started. The walkthrough below explains exactly what happens next.
         </p>
         <p className="text-xs text-white/30">
-          Nothing here is mocked — balances, approvals, contract
-          verification, and revokes are all live reads/writes against Monad
-          Testnet.
+          Nothing here is mocked. Balances, approvals, contract verification,
+          and revokes are all live reads and writes against Monad Testnet.
         </p>
       </div>
 
       <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-6 sm:p-8">
-        <p className="mb-1 text-sm font-medium text-white">Before you start</p>
+        <p className="font-display mb-1 text-sm font-medium text-white">
+          Before you start
+        </p>
         <p className="mb-5 text-xs text-white/40">
           Never used a crypto wallet before? Here&apos;s everything you need.
         </p>
@@ -109,11 +110,11 @@ export function LandingHero() {
           aria-hidden
           className="pointer-events-none absolute -top-16 left-1/3 h-56 w-56 rounded-full bg-blue-500/10 blur-3xl"
         />
-        <p className="relative mb-1 bg-linear-to-r from-blue-400 to-fuchsia-400 bg-clip-text text-sm font-medium text-transparent">
-          How it works — a full walkthrough
+        <p className="font-display relative mb-1 bg-linear-to-r from-blue-400 to-fuchsia-400 bg-clip-text text-sm font-medium text-transparent">
+          How it works: a full walkthrough
         </p>
         <p className="relative mb-5 text-xs text-white/40">
-          Step by step, in plain English — no crypto background required.
+          Step by step, in plain English. No crypto background required.
         </p>
         <ol className="relative flex flex-col gap-5">
           {STEPS.map((step, i) => (

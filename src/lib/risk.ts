@@ -22,7 +22,7 @@ export function assessApprovalRisk(params: {
     return {
       level: "high",
       reasons: [
-        "Unlimited approval — this spender can move your entire balance, now or in the future.",
+        "Unlimited approval. This spender can move your entire balance, now or in the future.",
       ],
       recommendation:
         "Revoke this approval, or replace it with an exact-amount approval before your next transaction with this contract.",

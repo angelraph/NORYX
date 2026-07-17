@@ -14,7 +14,7 @@ export default function Home() {
     <div className="flex flex-1 flex-col bg-black text-white">
       <header className="flex flex-col gap-4 border-b border-white/10 px-4 py-5 sm:flex-row sm:items-center sm:justify-between sm:px-10">
         <div>
-          <p className="text-lg font-semibold tracking-tight">Noryx</p>
+          <p className="font-display text-lg font-semibold tracking-tight">Noryx</p>
           <p className="text-xs text-white/40">
             Live onchain wallet security audit.
           </p>

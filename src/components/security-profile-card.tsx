@@ -94,10 +94,12 @@ export function SecurityProfileCard() {
 
   return (
     <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-6">
-      <p className="text-sm font-medium text-white">Your Security Profile</p>
+      <p className="font-display text-sm font-medium text-white">
+        Your Security Profile
+      </p>
       <p className="mt-1 text-xs text-white/40">
-        Saved on-chain in the SecurityProfile contract — your rules, checked
-        against every scan below.
+        Saved on-chain in the SecurityProfile contract, checked against every
+        scan below.
       </p>
 
       {isLoadingProfile ? (
