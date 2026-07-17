@@ -29,10 +29,19 @@ const STEPS = [
 
 export function LandingHero() {
   return (
-    <div className="flex flex-col gap-10 py-6 sm:py-10">
-      <div className="flex flex-col items-start gap-6">
+    <div className="relative flex flex-col gap-10 py-6 sm:py-10">
+      <div
+        aria-hidden
+        className="pointer-events-none absolute -top-24 -left-24 h-72 w-72 rounded-full bg-violet-500/20 blur-3xl"
+      />
+      <div
+        aria-hidden
+        className="pointer-events-none absolute -top-10 right-0 h-72 w-72 rounded-full bg-cyan-400/20 blur-3xl"
+      />
+
+      <div className="relative flex flex-col items-start gap-6">
         <div className="flex flex-col gap-4">
-          <h1 className="text-3xl font-semibold tracking-tight text-white sm:text-5xl">
+          <h1 className="bg-linear-to-r from-violet-400 to-cyan-300 bg-clip-text text-3xl font-semibold tracking-tight text-transparent sm:text-5xl">
             Know exactly what your wallet has approved.
           </h1>
           <p className="max-w-xl text-base text-white/50 sm:text-lg">

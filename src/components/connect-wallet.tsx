@@ -15,9 +15,10 @@ export function ConnectWallet() {
   const [isOpen, setIsOpen] = useState(false);
   const panelRef = useRef<HTMLDivElement>(null);
 
-  // The explicit metaMask()/coinbaseWallet() connectors and wagmi's
-  // automatic EIP-6963 injected discovery can both surface the same
-  // installed wallet — dedupe by name so it only appears once in the list.
+  // wagmi's EIP-6963 discovery can occasionally announce the same wallet
+  // twice (e.g. once via a legacy window.ethereum shim, once via the
+  // standard announceProvider event) — dedupe by name so it only appears
+  // once in the list.
   const uniqueConnectors = connectors.filter(
     (connector, i) => connectors.findIndex((c) => c.name === connector.name) === i,
   );
@@ -61,7 +62,7 @@ export function ConnectWallet() {
       <button
         onClick={() => setIsOpen((o) => !o)}
         disabled={isPending}
-        className="rounded-full bg-white px-4 py-2 text-sm font-semibold text-black transition hover:bg-white/90 disabled:cursor-not-allowed disabled:opacity-50"
+        className="rounded-full bg-linear-to-r from-violet-500 to-cyan-400 px-4 py-2 text-sm font-semibold text-white transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-50"
       >
         {isPending ? "Connecting..." : "Connect Wallet"}
       </button>
@@ -81,7 +82,7 @@ export function ConnectWallet() {
                   setIsOpen(false);
                 }}
                 disabled={isPending}
-                className="flex w-full items-center gap-3 px-4 py-3 text-left text-sm text-white transition hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-50"
+                className="flex w-full items-center gap-3 px-4 py-3 text-left text-sm text-white transition hover:bg-linear-to-r hover:from-violet-500/15 hover:to-cyan-400/15 disabled:cursor-not-allowed disabled:opacity-50"
               >
                 {connector.icon && (
                   // eslint-disable-next-line @next/next/no-img-element

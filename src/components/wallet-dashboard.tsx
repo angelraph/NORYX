@@ -47,26 +47,28 @@ export function WalletDashboard() {
   }
 
   return (
-    <div className="grid gap-4 rounded-2xl border border-white/10 bg-white/[0.02] p-6 sm:grid-cols-2 sm:p-8">
-      <div>
-        <p className="text-sm text-white/40">Wallet</p>
-        <p className="mt-1 break-all font-mono text-sm text-white">
-          {address}
-        </p>
-      </div>
-      <div>
-        <p className="text-sm text-white/40">Native balance (live)</p>
-        <p className="mt-1 text-2xl font-semibold text-white">
-          {isBalanceLoading && "Loading..."}
-          {isBalanceError && (
-            <span className="text-red-400">Failed to fetch</span>
-          )}
-          {balance &&
-            `${Number(formatUnits(balance.value, balance.decimals)).toLocaleString(
-              undefined,
-              { maximumFractionDigits: 4 },
-            )} ${balance.symbol}`}
-        </p>
+    <div className="rounded-2xl bg-linear-to-r from-violet-500/40 to-cyan-400/40 p-px">
+      <div className="grid gap-4 rounded-[15px] bg-black p-6 sm:grid-cols-2 sm:p-8">
+        <div>
+          <p className="text-sm text-white/40">Wallet</p>
+          <p className="mt-1 break-all font-mono text-sm text-white">
+            {address}
+          </p>
+        </div>
+        <div>
+          <p className="text-sm text-white/40">Native balance (live)</p>
+          <p className="mt-1 text-2xl font-semibold text-white">
+            {isBalanceLoading && "Loading..."}
+            {isBalanceError && (
+              <span className="text-red-400">Failed to fetch</span>
+            )}
+            {balance &&
+              `${Number(formatUnits(balance.value, balance.decimals)).toLocaleString(
+                undefined,
+                { maximumFractionDigits: 4 },
+              )} ${balance.symbol}`}
+          </p>
+        </div>
       </div>
     </div>
   );
