@@ -26,11 +26,15 @@ they could cost you.
 
 ## The solution
 
-Connect your wallet and Noryx scans your **live, current** token approvals
+Connect your wallet — or just paste any address into the lookup box, no
+connection required — and Noryx scans **live, current** token approvals
 on Monad Mainnet — not a cached snapshot, not a mock — scores each one by
 risk, and gives you a one-click way to fix it:
 
-1. **Connect** your wallet — scanning starts automatically, no button to click
+1. **Connect (or look up any address)** — scanning starts automatically
+   the moment there's an address to scan, no button to click. Viewing an
+   address you don't control is read-only: revoke/save-policy/publish
+   actions stay disabled until you connect that exact wallet.
 2. **Scan** — Noryx reads every `Approval` event your wallet has emitted
    recently across a tracked token set, then re-verifies each one against
    the *current* `allowance()` on-chain (a logged approval can already have
@@ -193,9 +197,11 @@ npm install
 npm run dev
 ```
 
-Open http://localhost:3000, connect a wallet on Monad Mainnet (chain ID
-`143`, RPC `https://rpc.monad.xyz`). You'll need a small amount of real MON
-in the wallet to pay gas for revokes — there's no faucet on mainnet.
+Open http://localhost:3000. You can paste any address into the lookup box
+to view it immediately — no wallet needed. To act on your own wallet
+(revoke, save a policy, publish a score), connect on Monad Mainnet (chain
+ID `143`, RPC `https://rpc.monad.xyz`) and keep a small amount of real MON
+on hand to pay gas — there's no faucet on mainnet.
 
 ## Project scripts
 

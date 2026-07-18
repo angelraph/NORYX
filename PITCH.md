@@ -3,6 +3,10 @@
 Live app: https://noryx-lyart.vercel.app
 Repo: github.com/angelraph/NORYX
 
+**For judges in a hurry:** you don't need a wallet to try this. Paste any
+address (yours, or a well-known one) into the lookup box on the live app
+and you'll see a real, live scan — no connection, no gas, no signup.
+
 Contracts (Monad Mainnet, all Sourcify-verified):
 - `SecurityProfile`: `0x884EEa8281C15c3516f10Cc6864EBBaA453AF9d8`
 - `ScoreRegistry`: `0x61b7de677d6548df8df1f73e107b69d67eee606b`
@@ -39,7 +43,9 @@ score above a threshold."
 
 ## 3. The solution (slide)
 
-Four things happen automatically the moment you connect a wallet:
+No connection required to look — paste any address and Noryx scans it
+read-only. Four things happen automatically the moment there's an
+address to look at (yours, connected, or anyone else's, pasted in):
 
 1. **Scan** — every `Approval` event emitted recently, re-verified
    against the *current* live `allowance()` (a logged approval may
@@ -58,8 +64,10 @@ rules (e.g. "flag unlimited approvals") and every scan checks against
 ## 4. Why Noryx, not revoke.cash (the slide that answers the objection)
 
 Someone will say "revoke.cash already does this." The honest answer:
-scanning + revoking is table stakes, several tools do it well. The
-structural difference is what happens to the score:
+scanning + revoking is table stakes, several tools do it well — Noryx
+also matches revoke.cash's no-connection viewing (paste any address, see
+its scan, no wallet required). The structural difference is what happens
+to the score:
 
 | | revoke.cash / typical scanner | Noryx |
 |---|---|---|
