@@ -12,8 +12,12 @@
   --font-heading: var(--font-fraunces);
   --font-mono: var(--font-geist-mono);
 
-  /* Monad brand kit (monad.xyz/brand-and-media-kit) */
-  --color-monad-purple: #6e54ff;
+  /* Monad brand kit (monad.xyz/brand-and-media-kit). Purple is #836EF9,
+     the fill color of Monad's actual live logomark SVG on their own site
+     right now — the brand-kit swatch section itself separately lists
+     #6E54FF, an inconsistency in their source material, but the live
+     logo asset is the more authoritative signal. */
+  --color-monad-purple: #836ef9;
   --color-monad-purple-light: #ddd7fe;
   --color-monad-navy: #0e091c;
   --color-monad-cyan: #85e6ff;
