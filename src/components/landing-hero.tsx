@@ -5,7 +5,7 @@ const PREREQUISITES = [
   },
   {
     title: "A little MON in your wallet",
-    body: "You'll need a small amount to pay gas if you revoke an approval. This is real MON on Monad Mainnet, not test tokens — buy or bridge some in before you start.",
+    body: "You'll need a small amount to pay gas if you revoke an approval. This is real MON on Monad Mainnet, not test tokens buy or bridge some in before you start.",
   },
   {
     title: "That's it",
