@@ -6,13 +6,16 @@ import path from "path";
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const root = path.join(__dirname, "..");
 
-const contractPath = path.join(root, "contracts", "SecurityProfile.sol");
+const contractName = process.argv[2] || "SecurityProfile";
+const kebabName = contractName.replace(/([a-z0-9])([A-Z])/g, "$1-$2").toLowerCase();
+
+const contractPath = path.join(root, "contracts", `${contractName}.sol`);
 const source = readFileSync(contractPath, "utf8");
 
 const input = {
   language: "Solidity",
   sources: {
-    "SecurityProfile.sol": { content: source },
+    [`${contractName}.sol`]: { content: source },
   },
   settings: {
     optimizer: { enabled: true, runs: 200 },
@@ -30,7 +33,7 @@ if (output.errors) {
   if (fatal.length > 0) process.exit(1);
 }
 
-const contract = output.contracts["SecurityProfile.sol"]["SecurityProfile"];
+const contract = output.contracts[`${contractName}.sol`][contractName];
 const artifact = {
   abi: contract.abi,
   bytecode: `0x${contract.evm.bytecode.object}`,
@@ -39,9 +42,9 @@ const artifact = {
 const outDir = path.join(root, "src", "lib", "contracts");
 mkdirSync(outDir, { recursive: true });
 writeFileSync(
-  path.join(outDir, "security-profile-artifact.json"),
+  path.join(outDir, `${kebabName}-artifact.json`),
   JSON.stringify(artifact, null, 2),
 );
 
-console.log("Compiled SecurityProfile.sol ->", path.join(outDir, "security-profile-artifact.json"));
+console.log(`Compiled ${contractName}.sol ->`, path.join(outDir, `${kebabName}-artifact.json`));
 console.log("Bytecode length:", contract.evm.bytecode.object.length / 2, "bytes");

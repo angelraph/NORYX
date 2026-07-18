@@ -18,6 +18,7 @@ import {
 import { monad } from "@/lib/chains";
 import { useRevokeApproval } from "@/hooks/use-revoke-approval";
 import { useSecurityProfile } from "@/hooks/use-security-profile";
+import { OnchainScoreCard } from "@/components/onchain-score-card";
 
 const TRACKED_SYMBOLS = "USDC, WETH, WMON";
 
@@ -257,6 +258,8 @@ export function RiskReport() {
             " Still checking further back automatically: score may update as older approvals are found."}
         </p>
       </div>
+
+      <OnchainScoreCard score={health} />
 
       {approvals.length > 0 && (
         <div className="flex flex-col gap-3">

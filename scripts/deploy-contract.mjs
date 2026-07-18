@@ -7,6 +7,10 @@ import path from "path";
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const root = path.join(__dirname, "..");
 
+const contractName = process.argv[2] || "SecurityProfile";
+const kebabName = contractName.replace(/([a-z0-9])([A-Z])/g, "$1-$2").toLowerCase();
+const constructorArgs = process.argv[3] ? JSON.parse(process.argv[3]) : [];
+
 const envContent = readFileSync(path.join(root, ".env.local"), "utf8");
 const privateKey = envContent.match(/DEPLOYER_PRIVATE_KEY=(0x[0-9a-fA-F]+)/)[1];
 const account = privateKeyToAccount(privateKey);
@@ -22,15 +26,17 @@ const publicClient = createPublicClient({ chain: monad, transport: http() });
 const walletClient = createWalletClient({ account, chain: monad, transport: http() });
 
 const artifact = JSON.parse(
-  readFileSync(path.join(root, "src", "lib", "contracts", "security-profile-artifact.json"), "utf8"),
+  readFileSync(path.join(root, "src", "lib", "contracts", `${kebabName}-artifact.json`), "utf8"),
 );
 
 console.log("Deploying from:", account.address);
+console.log("Contract:", contractName);
+console.log("Constructor args:", constructorArgs);
 
 const hash = await walletClient.deployContract({
   abi: artifact.abi,
   bytecode: artifact.bytecode,
-  args: [],
+  args: constructorArgs,
 });
 console.log("Deploy tx:", hash);
 
@@ -51,10 +57,11 @@ const deploymentInfo = {
   address: receipt.contractAddress,
   deployTx: hash,
   chainId: monad.id,
+  constructorArgs,
   deployedAt: new Date().toISOString(),
 };
 writeFileSync(
-  path.join(root, "src", "lib", "contracts", "security-profile-deployment.json"),
+  path.join(root, "src", "lib", "contracts", `${kebabName}-deployment.json`),
   JSON.stringify(deploymentInfo, null, 2),
 );
 console.log("Saved deployment info.");

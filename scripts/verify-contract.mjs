@@ -6,9 +6,12 @@ import solc from "solc";
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const root = path.join(__dirname, "..");
 
-const source = readFileSync(path.join(root, "contracts", "SecurityProfile.sol"), "utf8");
+const contractName = process.argv[2] || "SecurityProfile";
+const kebabName = contractName.replace(/([a-z0-9])([A-Z])/g, "$1-$2").toLowerCase();
+
+const source = readFileSync(path.join(root, "contracts", `${contractName}.sol`), "utf8");
 const deployment = JSON.parse(
-  readFileSync(path.join(root, "src", "lib", "contracts", "security-profile-deployment.json"), "utf8"),
+  readFileSync(path.join(root, "src", "lib", "contracts", `${kebabName}-deployment.json`), "utf8"),
 );
 
 const longVersion = solc.version(); // e.g. "0.8.24+commit.e11b9ed9.Emscripten.clang"
@@ -17,7 +20,7 @@ const compilerVersion = longVersion.split(".Emscripten")[0].split(".clang")[0];
 const stdJsonInput = {
   language: "Solidity",
   sources: {
-    "contracts/SecurityProfile.sol": { content: source },
+    [`contracts/${contractName}.sol`]: { content: source },
   },
   settings: {
     optimizer: { enabled: true, runs: 200 },
@@ -30,7 +33,7 @@ const stdJsonInput = {
 const body = {
   stdJsonInput,
   compilerVersion,
-  contractIdentifier: "contracts/SecurityProfile.sol:SecurityProfile",
+  contractIdentifier: `contracts/${contractName}.sol:${contractName}`,
   creationTransactionHash: deployment.deployTx,
 };
 

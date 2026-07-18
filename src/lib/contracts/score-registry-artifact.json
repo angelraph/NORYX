@@ -1,0 +1,72 @@
+{
+  "abi": [
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "user",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint8",
+          "name": "score",
+          "type": "uint8"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint64",
+          "name": "timestamp",
+          "type": "uint64"
+        }
+      ],
+      "name": "ScorePublished",
+      "type": "event"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "user",
+          "type": "address"
+        }
+      ],
+      "name": "getScore",
+      "outputs": [
+        {
+          "internalType": "uint8",
+          "name": "score",
+          "type": "uint8"
+        },
+        {
+          "internalType": "uint64",
+          "name": "timestamp",
+          "type": "uint64"
+        },
+        {
+          "internalType": "bool",
+          "name": "exists",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint8",
+          "name": "score",
+          "type": "uint8"
+        }
+      ],
+      "name": "publishScore",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    }
+  ],
+  "bytecode": "0x608060405234801561000f575f80fd5b506102698061001d5f395ff3fe608060405234801561000f575f80fd5b5060043610610034575f3560e01c806317e0f5e714610038578063d47875d01461004d575b5f80fd5b61004b6100463660046101e6565b6100e1565b005b6100b361005b36600461020d565b6001600160a01b03165f90815260208181526040918290208251606081018452905460ff808216808452610100830467ffffffffffffffff16948401859052600160481b909204161515919093018190529192909190565b6040805160ff909416845267ffffffffffffffff909216602084015215159082015260600160405180910390f35b60648160ff16111561012f5760405162461bcd60e51b8152602060048201526013602482015272073636f7265206d75737420626520302d31303606c1b604482015260640160405180910390fd5b6040805160608101825260ff83811680835267ffffffffffffffff42811660208086018281526001878901908152335f8181528085528a902098518954935192511515600160481b0269ff00000000000000000019939097166101000268ffffffffffffffffff199094169816979097179190911716929092179094558451918252810192909252917f682da428b4a124e283c9dcec18b6b3b135655947e6c89d4a47beae7ce3156af9910160405180910390a250565b5f602082840312156101f6575f80fd5b813560ff81168114610206575f80fd5b9392505050565b5f6020828403121561021d575f80fd5b81356001600160a01b0381168114610206575f80fdfea264697066735822122071e6d5a61b2f01a1d708ff1034d13c9ed7a3d96eef6b8a5b970a09d2e736f4b964736f6c63430008180033"
+}
