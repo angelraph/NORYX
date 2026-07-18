@@ -1,13 +1,16 @@
 import type { Metadata } from "next";
-import { Fraunces, Geist_Mono, Inter } from "next/font/google";
+import { Space_Grotesk, Roboto_Mono, Inter } from "next/font/google";
 import "./globals.css";
 import { Providers } from "./providers";
 
-// Canela is a commercial typeface with no free distribution, so headings
-// use Fraunces — the open-source serif designers reach for as its closest
-// free equivalent: same elegant, high-contrast warmth.
-const fraunces = Fraunces({
-  variable: "--font-fraunces",
+// Monad's brand kit (monad.xyz/brand-and-media-kit) specifies "Britti
+// Sans" for headlines — confirmed live on monad.xyz itself via its
+// `--font-britti-sans` CSS variable — but it's a commercial typeface from
+// Nois Type Studio with no free/Google Fonts distribution. Space Grotesk
+// is used here as its closest open-source equivalent: the same sleek,
+// geometric, minimalist character.
+const spaceGrotesk = Space_Grotesk({
+  variable: "--font-space-grotesk",
   subsets: ["latin"],
 });
 
@@ -16,8 +19,10 @@ const inter = Inter({
   subsets: ["latin"],
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+// Matches Monad's brand kit exactly: Roboto Mono for labels, buttons,
+// links, code, and decorative elements.
+const robotoMono = Roboto_Mono({
+  variable: "--font-roboto-mono",
   subsets: ["latin"],
 });
 
@@ -51,7 +56,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${fraunces.variable} ${inter.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${spaceGrotesk.variable} ${inter.variable} ${robotoMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
         <Providers>{children}</Providers>
