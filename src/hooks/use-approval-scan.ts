@@ -5,7 +5,7 @@ import { useConnection, usePublicClient } from "wagmi";
 import type { Address, PublicClient } from "viem";
 import { TRACKED_TOKENS, type TrackedToken } from "@/lib/tokens";
 import { erc20Abi } from "@/lib/erc20-abi";
-import { monadTestnet } from "@/lib/chains";
+import { monad } from "@/lib/chains";
 import { rpcCall } from "@/lib/rpc-utils";
 
 // Reflects real phase transitions inside the scan loop below — not a
@@ -13,17 +13,21 @@ import { rpcCall } from "@/lib/rpc-utils";
 // actually in flight right now.
 export type ScanStage = "loading-approvals" | "checking-allowances" | "done";
 
-// The public Monad Testnet RPC caps eth_getLogs to a 100-block range per
-// call and throttles to 25 req/s total (shared across every RPC read in the
-// app via rpcCall's queue) — so historical scanning has to run in bounded
-// chunks, and scanning further back costs real wall-clock time. The scan
-// below handles that by scanning a fast, small window first for an instant
-// first result, then growing the window in the background — re-fetching
-// only the newly-added slice each round, never blocks already covered.
+// The public Monad Mainnet RPC caps eth_getLogs to a 100-block range per
+// call (confirmed directly: a 500-block range returns -32614 "limited to a
+// 100 range") — so historical scanning has to run in bounded chunks, and
+// scanning further back costs real wall-clock time. The scan below handles
+// that by scanning a fast, small window first for an instant first result,
+// then growing the window in the background — re-fetching only the
+// newly-added slice each round, never blocks already covered.
+//
+// Block-count constants below are scaled for Monad Mainnet's ~0.4s block
+// time (confirmed directly via block timestamps — 2.5x faster than
+// testnet's ~1s), so they preserve the same real-world coverage windows.
 const CHUNK_SIZE = 100n;
-const FAST_PASS_BLOCKS = 6_000n; // ~100 min at Monad's ~1s block time
-const AUTO_CEILING_BLOCKS = 100_000n; // ~28h — auto-scanned with no user action needed
-export const HARD_CEILING_BLOCKS = 1_000_000n; // ~11.5 days — reachable via "scan even further"
+const FAST_PASS_BLOCKS = 15_000n; // ~100 min at Monad Mainnet's ~0.4s block time
+const AUTO_CEILING_BLOCKS = 252_000n; // ~28h — auto-scanned with no user action needed
+export const HARD_CEILING_BLOCKS = 2_484_000n; // ~11.5 days — reachable via "scan even further"
 const GROWTH_FACTOR = 3n;
 
 const approvalEventAbi = {
@@ -87,7 +91,7 @@ const initialState: ScanState = {
 
 export function useApprovalScan() {
   const { address, isConnected, chainId } = useConnection();
-  const publicClient = usePublicClient({ chainId: monadTestnet.id });
+  const publicClient = usePublicClient({ chainId: monad.id });
   const [state, setState] = useState<ScanState>(initialState);
 
   // Per-session mutable scan state that must never trigger its own render —
@@ -103,7 +107,7 @@ export function useApprovalScan() {
   } | null>(null);
 
   const enabled =
-    isConnected && !!address && chainId === monadTestnet.id && !!publicClient;
+    isConnected && !!address && chainId === monad.id && !!publicClient;
 
   const runSlice = useCallback(
     async (

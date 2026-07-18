@@ -4,8 +4,8 @@ const PREREQUISITES = [
     body: "MetaMask, Coinbase Wallet, and Phantom all work. Noryx detects whichever you have installed.",
   },
   {
-    title: "A little free testnet MON",
-    body: "You'll need a small amount to pay gas if you revoke an approval. Get some free from the Monad faucet at faucet.monad.xyz.",
+    title: "A little MON in your wallet",
+    body: "You'll need a small amount to pay gas if you revoke an approval. This is real MON on Monad Mainnet, not test tokens — buy or bridge some in before you start.",
   },
   {
     title: "That's it",
@@ -36,7 +36,7 @@ const STEPS = [
   },
   {
     title: "Fix it",
-    body: "Found something risky? Click \"Revoke\" right on that row. It's a real transaction on Monad Testnet that cancels the permission for good, so that contract can never move your tokens again.",
+    body: "Found something risky? Click \"Revoke\" right on that row. It's a real transaction on Monad Mainnet that cancels the permission for good, so that contract can never move your tokens again.",
   },
   {
     title: "Set your own policy",
@@ -49,33 +49,34 @@ export function LandingHero() {
     <div className="relative flex flex-col gap-10 py-6 sm:py-10">
       <div
         aria-hidden
-        className="pointer-events-none absolute -top-24 -left-24 h-72 w-72 rounded-full bg-violet-500/20 blur-3xl"
+        className="pointer-events-none absolute -top-24 -left-24 h-72 w-72 rounded-full bg-monad-purple/20 blur-3xl"
       />
       <div
         aria-hidden
-        className="pointer-events-none absolute -top-10 right-0 h-72 w-72 rounded-full bg-cyan-400/20 blur-3xl"
+        className="pointer-events-none absolute -top-10 right-0 h-72 w-72 rounded-full bg-monad-cyan/20 blur-3xl"
       />
 
       <div className="relative flex flex-col items-start gap-4">
         <div className="flex flex-col gap-4">
-          <h1 className="font-display bg-linear-to-r from-violet-400 to-cyan-300 bg-clip-text text-3xl font-semibold tracking-tight text-transparent sm:text-5xl">
+          <h1 className="font-display bg-linear-to-r from-monad-purple to-monad-cyan bg-clip-text text-3xl font-semibold tracking-tight text-transparent sm:text-5xl">
             Know exactly what your wallet has approved.
           </h1>
           <p className="max-w-xl text-base text-white/50 sm:text-lg">
             Every crypto user has clicked &ldquo;Approve&rdquo; without really
             knowing what they were signing away. Noryx scans your{" "}
             <span className="text-white/80">live, current</span> token
-            approvals on Monad Testnet, scores each one by risk, and gives
+            approvals on Monad Mainnet, scores each one by risk, and gives
             you a one-click way to fix it.
           </p>
         </div>
-        <p className="text-sm font-medium text-cyan-300">
+        <p className="text-sm font-medium text-monad-cyan">
           New here? Tap &ldquo;Connect Wallet&rdquo; in the top right to get
           started. The walkthrough below explains exactly what happens next.
         </p>
         <p className="text-xs text-white/30">
           Nothing here is mocked. Balances, approvals, contract verification,
-          and revokes are all live reads and writes against Monad Testnet.
+          and revokes are all live reads and writes against Monad Mainnet —
+          real funds, real transactions, real gas.
         </p>
       </div>
 
@@ -104,13 +105,13 @@ export function LandingHero() {
       <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.02] p-6 sm:p-8">
         <div
           aria-hidden
-          className="pointer-events-none absolute -bottom-24 -right-24 h-64 w-64 rounded-full bg-fuchsia-500/10 blur-3xl"
+          className="pointer-events-none absolute -bottom-24 -right-24 h-64 w-64 rounded-full bg-monad-pink/10 blur-3xl"
         />
         <div
           aria-hidden
-          className="pointer-events-none absolute -top-16 left-1/3 h-56 w-56 rounded-full bg-blue-500/10 blur-3xl"
+          className="pointer-events-none absolute -top-16 left-1/3 h-56 w-56 rounded-full bg-monad-orange/10 blur-3xl"
         />
-        <p className="font-display relative mb-1 bg-linear-to-r from-blue-400 to-fuchsia-400 bg-clip-text text-sm font-medium text-transparent">
+        <p className="font-display relative mb-1 bg-linear-to-r from-monad-orange to-monad-pink bg-clip-text text-sm font-medium text-transparent">
           How it works: a full walkthrough
         </p>
         <p className="relative mb-5 text-xs text-white/40">
@@ -119,7 +120,7 @@ export function LandingHero() {
         <ol className="relative flex flex-col gap-5">
           {STEPS.map((step, i) => (
             <li key={step.title} className="flex gap-3">
-              <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-linear-to-r from-blue-500 to-fuchsia-500 p-px text-xs font-semibold text-white">
+              <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-linear-to-r from-monad-orange to-monad-pink p-px text-xs font-semibold text-white">
                 <span className="flex h-full w-full items-center justify-center rounded-full bg-black">
                   {i + 1}
                 </span>

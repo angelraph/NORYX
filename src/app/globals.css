@@ -11,6 +11,15 @@
   --font-sans: var(--font-inter);
   --font-heading: var(--font-fraunces);
   --font-mono: var(--font-geist-mono);
+
+  /* Monad brand kit (monad.xyz/brand-and-media-kit) */
+  --color-monad-purple: #6e54ff;
+  --color-monad-purple-light: #ddd7fe;
+  --color-monad-navy: #0e091c;
+  --color-monad-cyan: #85e6ff;
+  --color-monad-cyan-light: #b9e3f9;
+  --color-monad-pink: #ff8ee4;
+  --color-monad-orange: #ffae45;
 }
 
 @media (prefers-color-scheme: dark) {

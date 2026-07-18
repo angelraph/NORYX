@@ -28,4 +28,4 @@ if (existsSync(envPath)) {
 }
 
 console.log("Generated new burner deployer wallet.");
-console.log("Address (fund this with testnet MON):", account.address);
+console.log("Address (fund this with mainnet MON):", account.address);

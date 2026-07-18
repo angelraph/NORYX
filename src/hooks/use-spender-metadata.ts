@@ -3,7 +3,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { usePublicClient } from "wagmi";
 import type { Address, PublicClient } from "viem";
-import { monadTestnet } from "@/lib/chains";
+import { monad } from "@/lib/chains";
 import { rpcCall } from "@/lib/rpc-utils";
 import { checkContractVerified } from "@/lib/sourcify";
 import { findDeploymentBlock } from "@/lib/contract-age";
@@ -27,7 +27,7 @@ async function loadSpenderMetadata(
   }
 
   const [isVerified, deployment] = await Promise.all([
-    checkContractVerified(monadTestnet.id, spender),
+    checkContractVerified(monad.id, spender),
     findDeploymentBlock(client, spender, latestBlock),
   ]);
 
@@ -40,7 +40,7 @@ async function loadSpenderMetadata(
 }
 
 export function useSpenderMetadata(spenders: Address[], latestBlock: bigint | undefined) {
-  const publicClient = usePublicClient({ chainId: monadTestnet.id });
+  const publicClient = usePublicClient({ chainId: monad.id });
   const sortedKey = [...spenders].sort().join(",");
 
   return useQuery({

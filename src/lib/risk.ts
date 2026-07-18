@@ -75,11 +75,15 @@ export type ContractFlag = {
   penalty: number;
 };
 
-// Roughly 14 hours at Monad's ~1s block time.
-const NEW_CONTRACT_THRESHOLD_BLOCKS = 50_000n;
+// Monad Mainnet's block time, confirmed directly from consecutive block
+// timestamps (~0.4s/block, vs testnet's ~1s).
+const BLOCK_TIME_SECONDS = 0.4;
+
+// Roughly 14 hours at Monad Mainnet's block time.
+const NEW_CONTRACT_THRESHOLD_BLOCKS = 126_000n;
 
 export function formatBlockAge(blocks: bigint): string {
-  const seconds = Number(blocks); // ~1s per block on Monad Testnet
+  const seconds = Number(blocks) * BLOCK_TIME_SECONDS;
   if (seconds < 3600) return `~${Math.max(1, Math.round(seconds / 60))}m`;
   if (seconds < 86400) return `~${Math.round(seconds / 3600)}h`;
   return `~${Math.round(seconds / 86400)}d`;

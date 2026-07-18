@@ -2,7 +2,7 @@
 
 import { useConnection, useBalance, useSwitchChain } from "wagmi";
 import { formatUnits } from "viem";
-import { monadTestnet } from "@/lib/chains";
+import { monad } from "@/lib/chains";
 
 export function WalletDashboard() {
   const { address, isConnected, chainId } = useConnection();
@@ -14,40 +14,40 @@ export function WalletDashboard() {
     isError: isBalanceError,
   } = useBalance({
     address,
-    chainId: monadTestnet.id,
+    chainId: monad.id,
     query: { enabled: isConnected && !!address },
   });
 
   if (!isConnected) {
     return (
       <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-6 text-center text-white/50 sm:p-8">
-        Connect your wallet to see your live balance on Monad Testnet.
+        Connect your wallet to see your live balance on Monad Mainnet.
       </div>
     );
   }
 
-  const onWrongChain = chainId !== monadTestnet.id;
+  const onWrongChain = chainId !== monad.id;
 
   if (onWrongChain) {
     return (
       <div className="flex flex-col items-center gap-4 rounded-2xl border border-amber-500/30 bg-amber-500/10 p-6 text-center sm:p-8">
         <p className="text-amber-300">
           You&apos;re connected to chain {chainId}. Noryx reads live data from
-          Monad Testnet.
+          Monad Mainnet.
         </p>
         <button
-          onClick={() => switchChain({ chainId: monadTestnet.id })}
+          onClick={() => switchChain({ chainId: monad.id })}
           disabled={isSwitching}
           className="rounded-full bg-amber-400 px-4 py-2 text-sm font-semibold text-black transition hover:bg-amber-300 disabled:opacity-50"
         >
-          {isSwitching ? "Switching..." : "Switch to Monad Testnet"}
+          {isSwitching ? "Switching..." : "Switch to Monad Mainnet"}
         </button>
       </div>
     );
   }
 
   return (
-    <div className="rounded-2xl bg-linear-to-r from-violet-500/40 to-cyan-400/40 p-px">
+    <div className="rounded-2xl bg-linear-to-r from-monad-purple/40 to-monad-cyan/40 p-px">
       <div className="grid gap-4 rounded-[15px] bg-black p-6 sm:grid-cols-2 sm:p-8">
         <div>
           <p className="text-sm text-white/40">Wallet</p>

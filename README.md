@@ -10,7 +10,7 @@ transaction simulation infrastructure we deliberately chose not to depend
 on (see [What's not built](#whats-not-built), below).
 
 Live app: **https://noryx-lyart.vercel.app**
-Contract (Monad Testnet, verified): [`0x884EEa8281C15c3516f10Cc6864EBBaA453AF9d8`](https://testnet.monadvision.com/address/0x884EEa8281C15c3516f10Cc6864EBBaA453AF9d8)
+Contract (Monad Mainnet, verified): [`0x884EEa8281C15c3516f10Cc6864EBBaA453AF9d8`](https://monadscan.com/address/0x884EEa8281C15c3516f10Cc6864EBBaA453AF9d8)
 
 ## The problem
 
@@ -23,7 +23,7 @@ they could cost you.
 ## The solution
 
 Connect your wallet and Noryx scans your **live, current** token approvals
-on Monad Testnet — not a cached snapshot, not a mock — scores each one by
+on Monad Mainnet — not a cached snapshot, not a mock — scores each one by
 risk, and gives you a one-click way to fix it:
 
 1. **Connect** your wallet — scanning starts automatically, no button to click
@@ -48,7 +48,7 @@ risk, and gives you a one-click way to fix it:
 
 Nothing here is mocked. Wallet balance, approvals, contract verification
 status, contract age, risk scores, revokes, and saved preferences are all
-live reads/writes against Monad Testnet.
+live reads/writes against Monad Mainnet.
 
 ## Why this, and not a generic "explain any transaction" tool
 
@@ -65,12 +65,12 @@ end to end, rather than a shallow pass across everything.
 - wagmi 3 + viem for wallet connection and all on-chain reads/writes
 - Solidity (`SecurityProfile.sol`), compiled with `solc` and deployed with
   a plain viem script (no Foundry/Hardhat dependency)
-- Monad Testnet (chain ID `10143`)
+- Monad Mainnet (chain ID `143`)
 
 ## How the approval scan actually works
 
-The public Monad Testnet RPC caps `eth_getLogs` to a 100-block range and
-rate-limits to 25 requests/second. `useApprovalScan`
+The public Monad Mainnet RPC caps `eth_getLogs` to a 100-block range.
+`useApprovalScan`
 (`src/hooks/use-approval-scan.ts`) handles both constraints directly: it
 chunks the scan window into 100-block requests and runs them through a
 single globally-concurrency-limited queue (not per-token) with
@@ -98,10 +98,10 @@ primary sources rather than a maintained allowlist:
   `scripts/verify-contract.mjs` uses to verify our own contract.
 - **How old is it?** Binary-searched from historical `eth_getCode`
   presence (`src/lib/contract-age.ts`) rather than guessed. The public RPC
-  only retains ~5,000,000 blocks of historical state (confirmed by testing
-  directly — older queries fail outright), so a contract older than that
-  window is reported as "established, at least this old" rather than a
-  fabricated precise age.
+  only retains ~1,928,000 blocks of historical state (confirmed by
+  binary-searching the boundary directly — older queries fail outright), so
+  a contract older than that window is reported as "established, at least
+  this old" rather than a fabricated precise age.
 
 Every RPC read in the app — the approval scan and these contract checks
 alike — shares one rate-limit-safe queue (`src/lib/rpc-utils.ts`), since
@@ -139,9 +139,9 @@ npm install
 npm run dev
 ```
 
-Open http://localhost:3000, connect a wallet on Monad Testnet (chain ID
-`10143`, RPC `https://testnet-rpc.monad.xyz`), and get testnet MON from
-the [faucet](https://faucet.monad.xyz) if needed.
+Open http://localhost:3000, connect a wallet on Monad Mainnet (chain ID
+`143`, RPC `https://rpc.monad.xyz`). You'll need a small amount of real MON
+in the wallet to pay gas for revokes — there's no faucet on mainnet.
 
 ## Project scripts
 
@@ -162,6 +162,6 @@ Foundry/Hardhat installation required:
 - Full arbitrary-transaction simulation ("paste any calldata and see the
   before/after balances") — this needs simulation infrastructure
   (Tenderly-style forked `eth_call`) that isn't confirmed to exist for
-  Monad Testnet, so it was deliberately cut in favor of shipping the
+  Monad Mainnet, so it was deliberately cut in favor of shipping the
   approval-scanning path completely and honestly rather than half-building
   a broader promise.

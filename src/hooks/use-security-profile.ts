@@ -6,7 +6,7 @@ import {
   SECURITY_PROFILE_ADDRESS,
   securityProfileAbi,
 } from "@/lib/security-profile";
-import { monadTestnet } from "@/lib/chains";
+import { monad } from "@/lib/chains";
 
 export type SecurityProfile = {
   blockUnlimitedApprovals: boolean;
@@ -19,7 +19,7 @@ export function useSecurityProfile() {
   const { address } = useConnection();
 
   const readQuery = useReadContract({
-    chainId: monadTestnet.id,
+    chainId: monad.id,
     address: SECURITY_PROFILE_ADDRESS,
     abi: securityProfileAbi,
     functionName: "getPreferences",
@@ -44,7 +44,7 @@ export function useSecurityProfile() {
     warnNewContracts: boolean;
   }) {
     mutate({
-      chainId: monadTestnet.id,
+      chainId: monad.id,
       address: SECURITY_PROFILE_ADDRESS,
       abi: securityProfileAbi,
       functionName: "savePreferences",

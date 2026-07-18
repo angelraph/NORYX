@@ -1,12 +1,14 @@
 import type { Address, PublicClient } from "viem";
 import { rpcCall } from "./rpc-utils";
 
-// The RPC only keeps ~5,000,000 blocks of historical state (confirmed by
-// testing directly — queries further back fail with "historical state that
-// is not available"). Binary search is bounded to that window: if a
-// contract already existed at the floor of the window, we report it as
-// "at least this old" rather than claiming a precise (wrong) block.
-const MAX_LOOKBACK_BLOCKS = 5_000_000n;
+// Monad Mainnet's public RPC only keeps ~1,928,000 blocks of historical
+// eth_getCode state (confirmed by binary-searching the boundary directly —
+// queries further back fail with "historical state that is not
+// available"; this is a smaller window than testnet's ~5,000,000). Binary
+// search is bounded to that window: if a contract already existed at the
+// floor of the window, we report it as "at least this old" rather than
+// claiming a precise (wrong) block.
+const MAX_LOOKBACK_BLOCKS = 1_900_000n;
 
 async function hasCodeAt(
   client: PublicClient,

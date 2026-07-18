@@ -1,6 +1,6 @@
 import { createConfig, http } from "wagmi";
 import { injected } from "wagmi/connectors";
-import { monadTestnet } from "./chains";
+import { monad } from "./chains";
 
 // A single injected() connector plus wagmi's built-in EIP-6963 multi-wallet
 // discovery (on by default) is what actually detects every installed
@@ -11,10 +11,10 @@ import { monadTestnet } from "./chains";
 // of the plain window.ethereum handshake, which can silently fail to
 // connect even when the extension is installed and unlocked.
 export const wagmiConfig = createConfig({
-  chains: [monadTestnet],
+  chains: [monad],
   connectors: [injected()],
   transports: {
-    [monadTestnet.id]: http(),
+    [monad.id]: http(),
   },
   ssr: true,
 });

@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useConnection } from "wagmi";
 import { useSecurityProfile, type SecurityProfile } from "@/hooks/use-security-profile";
-import { monadTestnet } from "@/lib/chains";
+import { monad } from "@/lib/chains";
 
 function ProfileForm({
   initialProfile,
@@ -90,7 +90,7 @@ export function SecurityProfileCard() {
   const { profile, isLoadingProfile, save, isSaving, isSaved, error } =
     useSecurityProfile();
 
-  if (!isConnected || chainId !== monadTestnet.id) return null;
+  if (!isConnected || chainId !== monad.id) return null;
 
   return (
     <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-6">

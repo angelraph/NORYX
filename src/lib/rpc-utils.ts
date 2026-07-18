@@ -1,7 +1,10 @@
-// The public Monad Testnet RPC rate-limits to 25 requests/sec (confirmed by
-// hitting it directly during development — error code -32011, "limited to
-// 25/sec"). Every read path in this app funnels through this single
-// semaphore so concurrent hooks can't collectively blow through that limit,
+// Monad Testnet's public RPC rate-limited to 25 requests/sec (error code
+// -32011, "limited to 25/sec"); a burst test of 60 concurrent requests
+// against the mainnet RPC produced no rate-limit errors, so this cap may be
+// looser or absent there, but the concurrency limit and retry-on-32011
+// logic are kept as a safe default in case that changes under real load.
+// Every read path in this app funnels through this single semaphore so
+// concurrent hooks can't collectively blow through whatever the limit is,
 // and every call gets retried with backoff if it does.
 const GLOBAL_CONCURRENCY = 8;
 const MAX_RETRIES = 5;

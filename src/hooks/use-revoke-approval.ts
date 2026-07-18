@@ -8,7 +8,7 @@ import {
 } from "wagmi";
 import { useQueryClient } from "@tanstack/react-query";
 import { erc20Abi } from "@/lib/erc20-abi";
-import { monadTestnet } from "@/lib/chains";
+import { monad } from "@/lib/chains";
 
 export function useRevokeApproval() {
   const queryClient = useQueryClient();
@@ -24,7 +24,7 @@ export function useRevokeApproval() {
 
   function revoke(token: Address, spender: Address) {
     mutate({
-      chainId: monadTestnet.id,
+      chainId: monad.id,
       address: token,
       abi: erc20Abi,
       functionName: "approve",

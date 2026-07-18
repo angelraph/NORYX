@@ -62,7 +62,7 @@ export function ConnectWallet() {
       <button
         onClick={() => setIsOpen((o) => !o)}
         disabled={isPending}
-        className="rounded-full bg-linear-to-r from-violet-500 to-cyan-400 px-4 py-2 text-sm font-semibold text-white transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-50"
+        className="rounded-full bg-linear-to-r from-monad-purple to-monad-cyan px-4 py-2 text-sm font-semibold text-white transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-50"
       >
         {isPending ? "Connecting..." : "Connect Wallet"}
       </button>
@@ -82,7 +82,7 @@ export function ConnectWallet() {
                   setIsOpen(false);
                 }}
                 disabled={isPending}
-                className="flex w-full items-center gap-3 px-4 py-3 text-left text-sm text-white transition hover:bg-linear-to-r hover:from-violet-500/15 hover:to-cyan-400/15 disabled:cursor-not-allowed disabled:opacity-50"
+                className="flex w-full items-center gap-3 px-4 py-3 text-left text-sm text-white transition hover:bg-linear-to-r hover:from-monad-purple/15 hover:to-monad-cyan/15 disabled:cursor-not-allowed disabled:opacity-50"
               >
                 {connector.icon && (
                   // eslint-disable-next-line @next/next/no-img-element

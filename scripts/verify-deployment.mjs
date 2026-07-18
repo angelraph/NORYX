@@ -11,13 +11,13 @@ const envContent = readFileSync(path.join(root, ".env.local"), "utf8");
 const privateKey = envContent.match(/DEPLOYER_PRIVATE_KEY=(0x[0-9a-fA-F]+)/)[1];
 const account = privateKeyToAccount(privateKey);
 
-const monadTestnet = {
-  id: 10143,
+const monad = {
+  id: 143,
   nativeCurrency: { name: "Monad", symbol: "MON", decimals: 18 },
-  rpcUrls: { default: { http: ["https://testnet-rpc.monad.xyz"] } },
+  rpcUrls: { default: { http: ["https://rpc.monad.xyz"] } },
 };
-const publicClient = createPublicClient({ chain: monadTestnet, transport: http() });
-const walletClient = createWalletClient({ account, chain: monadTestnet, transport: http() });
+const publicClient = createPublicClient({ chain: monad, transport: http() });
+const walletClient = createWalletClient({ account, chain: monad, transport: http() });
 
 const artifact = JSON.parse(readFileSync(path.join(root, "src", "lib", "contracts", "security-profile-artifact.json"), "utf8"));
 const deployment = JSON.parse(readFileSync(path.join(root, "src", "lib", "contracts", "security-profile-deployment.json"), "utf8"));
@@ -44,7 +44,7 @@ console.log("After save (expect true/1000000/true/true):", after);
 
 const other = await publicClient.readContract({
   address, abi: artifact.abi, functionName: "getPreferences",
-  args: ["0x0000000000000000000000000000000000dEaD"],
+  args: ["0x000000000000000000000000000000000000dEaD"],
 });
 console.log("Different address, never saved (expect all false/0):", other);
 

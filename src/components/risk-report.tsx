@@ -15,7 +15,7 @@ import {
   type SpenderMetadata,
   type ContractFlag,
 } from "@/lib/risk";
-import { monadTestnet } from "@/lib/chains";
+import { monad } from "@/lib/chains";
 import { useRevokeApproval } from "@/hooks/use-revoke-approval";
 import { useSecurityProfile } from "@/hooks/use-security-profile";
 
@@ -58,9 +58,9 @@ function ScanProgress({ current }: { current: ProgressStepKey }) {
   const currentIndex = PROGRESS_STEPS.findIndex((s) => s.key === current);
 
   return (
-    <div className="rounded-2xl bg-linear-to-r from-violet-500/40 to-cyan-400/40 p-px">
+    <div className="rounded-2xl bg-linear-to-r from-monad-purple/40 to-monad-cyan/40 p-px">
       <div className="rounded-[15px] bg-black p-6 sm:p-8">
-        <p className="font-display mb-4 bg-linear-to-r from-violet-400 to-cyan-300 bg-clip-text text-sm text-transparent">
+        <p className="font-display mb-4 bg-linear-to-r from-monad-purple to-monad-cyan bg-clip-text text-sm text-transparent">
           Running your wallet security audit...
         </p>
         <div className="flex flex-col gap-2.5">
@@ -72,9 +72,9 @@ function ScanProgress({ current }: { current: ProgressStepKey }) {
                 <span
                   className={
                     done
-                      ? "text-cyan-400"
+                      ? "text-monad-cyan"
                       : active
-                        ? "animate-pulse bg-linear-to-r from-violet-400 to-cyan-300 bg-clip-text text-transparent"
+                        ? "animate-pulse bg-linear-to-r from-monad-purple to-monad-cyan bg-clip-text text-transparent"
                         : "text-white/20"
                   }
                 >
@@ -114,7 +114,7 @@ function ApprovalRow({
           {approval.token.symbol}{" "}
           <span className="font-normal text-white/40">approved to</span>{" "}
           <a
-            href={`${monadTestnet.blockExplorers.default.url}/address/${approval.spender}`}
+            href={`${monad.blockExplorers.default.url}/address/${approval.spender}`}
             target="_blank"
             rel="noopener noreferrer"
             className="font-mono text-sm text-white/70 underline decoration-white/20 underline-offset-2 hover:text-white"
@@ -124,7 +124,7 @@ function ApprovalRow({
         </p>
         <p className="mt-1 text-sm text-white/50">{risk.reasons[0]}</p>
         {violatesPolicy && (
-          <p className="mt-1 text-xs font-semibold text-fuchsia-400">
+          <p className="mt-1 text-xs font-semibold text-monad-pink">
             Violates your saved security policy (unlimited approvals blocked).
           </p>
         )}
@@ -192,7 +192,7 @@ export function RiskReport() {
   const { data: spenderMetadata, isLoading: isLoadingSpenderMetadata } =
     useSpenderMetadata(uniqueSpenders, scannedToBlock);
 
-  if (!isConnected || chainId !== monadTestnet.id) return null;
+  if (!isConnected || chainId !== monad.id) return null;
 
   const isAuditingContracts = approvals.length > 0 && isLoadingSpenderMetadata;
 
@@ -252,7 +252,7 @@ export function RiskReport() {
         </p>
         <p className="mt-1 text-xs text-white/30">
           Scanned the last ~{formatBlockAge(scannedBlockSpan)} ({TRACKED_SYMBOLS})
-          on Monad Testnet. Live on every load, nothing cached or mocked.
+          on Monad Mainnet. Live on every load, nothing cached or mocked.
           {isScanningDeeper &&
             " Still checking further back automatically: score may update as older approvals are found."}
         </p>
