@@ -21,10 +21,26 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+const title = "Noryx: Live onchain wallet security audit";
+const description =
+  "Noryx continuously audits your wallet's live approvals and permissions on Monad, explains the risk in plain English, and lets you fix it with a real transaction.";
+
 export const metadata: Metadata = {
-  title: "Noryx: Live onchain wallet security audit",
-  description:
-    "Noryx continuously audits your wallet's live approvals and permissions on Monad, explains the risk in plain English, and lets you fix it with a real transaction.",
+  metadataBase: new URL("https://noryx-lyart.vercel.app"),
+  title,
+  description,
+  openGraph: {
+    title,
+    description,
+    url: "https://noryx-lyart.vercel.app",
+    siteName: "Noryx",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title,
+    description,
+  },
 };
 
 export default function RootLayout({

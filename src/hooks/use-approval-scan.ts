@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { useConnection, usePublicClient } from "wagmi";
+import { usePublicClient } from "wagmi";
 import type { Address, PublicClient } from "viem";
 import { TRACKED_TOKENS, type TrackedToken } from "@/lib/tokens";
 import { erc20Abi } from "@/lib/erc20-abi";
@@ -89,8 +89,8 @@ const initialState: ScanState = {
   stage: "loading-approvals",
 };
 
-export function useApprovalScan() {
-  const { address, isConnected, chainId } = useConnection();
+export function useApprovalScan(viewAddress: Address | undefined) {
+  const address = viewAddress;
   const publicClient = usePublicClient({ chainId: monad.id });
   const [state, setState] = useState<ScanState>(initialState);
 
@@ -106,8 +106,7 @@ export function useApprovalScan() {
     balances: TokenBalance[];
   } | null>(null);
 
-  const enabled =
-    isConnected && !!address && chainId === monad.id && !!publicClient;
+  const enabled = !!address && !!publicClient;
 
   const runSlice = useCallback(
     async (
@@ -307,7 +306,7 @@ export function useApprovalScan() {
       // eslint-disable-next-line react-hooks/exhaustive-deps
       generationRef.current++;
     };
-  }, [address, chainId, enabled, publicClient, runSlice]);
+  }, [address, enabled, publicClient, runSlice]);
 
   const scanFurther = useCallback(async () => {
     const generation = generationRef.current;

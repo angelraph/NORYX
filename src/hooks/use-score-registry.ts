@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect } from "react";
-import { useConnection, useReadContract, useWriteContract, useWaitForTransactionReceipt } from "wagmi";
+import type { Address } from "viem";
+import { useReadContract, useWriteContract, useWaitForTransactionReceipt } from "wagmi";
 import {
   SCORE_REGISTRY_ADDRESS,
   scoreRegistryAbi,
@@ -14,16 +15,14 @@ export type PublishedScore = {
   exists: boolean;
 };
 
-export function useScoreRegistry() {
-  const { address } = useConnection();
-
+export function useScoreRegistry(viewAddress: Address | undefined) {
   const readQuery = useReadContract({
     chainId: monad.id,
     address: SCORE_REGISTRY_ADDRESS,
     abi: scoreRegistryAbi,
     functionName: "getScore",
-    args: address ? [address] : undefined,
-    query: { enabled: !!address },
+    args: viewAddress ? [viewAddress] : undefined,
+    query: { enabled: !!viewAddress },
   });
 
   const { mutate, data: hash, isPending, error } = useWriteContract();

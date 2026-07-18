@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect } from "react";
-import { useConnection, useReadContract, useWriteContract, useWaitForTransactionReceipt } from "wagmi";
+import type { Address } from "viem";
+import { useReadContract, useWriteContract, useWaitForTransactionReceipt } from "wagmi";
 import {
   SECURITY_PROFILE_ADDRESS,
   securityProfileAbi,
@@ -15,16 +16,14 @@ export type SecurityProfile = {
   exists: boolean;
 };
 
-export function useSecurityProfile() {
-  const { address } = useConnection();
-
+export function useSecurityProfile(viewAddress: Address | undefined) {
   const readQuery = useReadContract({
     chainId: monad.id,
     address: SECURITY_PROFILE_ADDRESS,
     abi: securityProfileAbi,
     functionName: "getPreferences",
-    args: address ? [address] : undefined,
-    query: { enabled: !!address },
+    args: viewAddress ? [viewAddress] : undefined,
+    query: { enabled: !!viewAddress },
   });
 
   const { mutate, data: hash, isPending, error } = useWriteContract();

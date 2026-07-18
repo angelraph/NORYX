@@ -1,7 +1,6 @@
 "use client";
 
 import { formatUnits, type Address } from "viem";
-import { useConnection } from "wagmi";
 import { useApprovalScan, type LiveApproval } from "@/hooks/use-approval-scan";
 import { useSpenderMetadata } from "@/hooks/use-spender-metadata";
 import {
@@ -98,11 +97,13 @@ function ApprovalRow({
   risk,
   violatesPolicy,
   contractFlags,
+  isOwnWallet,
 }: {
   approval: LiveApproval;
   risk: ApprovalRisk;
   violatesPolicy: boolean;
   contractFlags: ContractFlag[];
+  isOwnWallet: boolean;
 }) {
   const { revoke, isPending, isConfirming, isConfirmed, error } =
     useRevokeApproval();
@@ -155,26 +156,37 @@ function ApprovalRow({
         >
           {risk.level}
         </span>
-        <button
-          onClick={() => revoke(approval.token.address, approval.spender)}
-          disabled={busy || isConfirmed}
-          className="shrink-0 rounded-full border border-white/10 px-3 py-1.5 text-xs font-semibold text-white/70 transition hover:border-red-400/50 hover:text-red-300 disabled:opacity-50"
-        >
-          {isConfirmed
-            ? "Revoked"
-            : isConfirming
-              ? "Confirming..."
-              : isPending
-                ? "Confirm in wallet..."
-                : "Revoke"}
-        </button>
+        {isOwnWallet ? (
+          <button
+            onClick={() => revoke(approval.token.address, approval.spender)}
+            disabled={busy || isConfirmed}
+            className="shrink-0 rounded-full border border-white/10 px-3 py-1.5 text-xs font-semibold text-white/70 transition hover:border-red-400/50 hover:text-red-300 disabled:opacity-50"
+          >
+            {isConfirmed
+              ? "Revoked"
+              : isConfirming
+                ? "Confirming..."
+                : isPending
+                  ? "Confirm in wallet..."
+                  : "Revoke"}
+          </button>
+        ) : (
+          <span className="shrink-0 rounded-full border border-white/10 px-3 py-1.5 text-xs text-white/30">
+            Read-only
+          </span>
+        )}
       </div>
     </div>
   );
 }
 
-export function RiskReport() {
-  const { isConnected, chainId } = useConnection();
+export function RiskReport({
+  viewAddress,
+  isOwnWallet,
+}: {
+  viewAddress: Address;
+  isOwnWallet: boolean;
+}) {
   const {
     approvals,
     scannedFromBlock,
@@ -186,14 +198,12 @@ export function RiskReport() {
     stage,
     canScanFurther,
     scanFurther,
-  } = useApprovalScan();
-  const { profile } = useSecurityProfile();
+  } = useApprovalScan(viewAddress);
+  const { profile } = useSecurityProfile(viewAddress);
 
   const uniqueSpenders = Array.from(new Set(approvals.map((a) => a.spender)));
   const { data: spenderMetadata, isLoading: isLoadingSpenderMetadata } =
     useSpenderMetadata(uniqueSpenders, scannedToBlock);
-
-  if (!isConnected || chainId !== monad.id) return null;
 
   const isAuditingContracts = approvals.length > 0 && isLoadingSpenderMetadata;
 
@@ -259,7 +269,7 @@ export function RiskReport() {
         </p>
       </div>
 
-      <OnchainScoreCard score={health} />
+      <OnchainScoreCard score={health} viewAddress={viewAddress} isOwnWallet={isOwnWallet} />
 
       {approvals.length > 0 && (
         <div className="flex flex-col gap-3">
@@ -269,6 +279,7 @@ export function RiskReport() {
               approval={approval}
               risk={risks[i]}
               contractFlags={contractFlagsByIndex[i]}
+              isOwnWallet={isOwnWallet}
               violatesPolicy={
                 !!profile?.exists &&
                 profile.blockUnlimitedApprovals &&

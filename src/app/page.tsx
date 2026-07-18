@@ -1,14 +1,22 @@
 "use client";
 
+import { useState } from "react";
+import type { Address } from "viem";
 import { useConnection } from "wagmi";
 import { ConnectWallet } from "@/components/connect-wallet";
 import { LandingHero } from "@/components/landing-hero";
 import { WalletDashboard } from "@/components/wallet-dashboard";
 import { SecurityProfileCard } from "@/components/security-profile-card";
 import { RiskReport } from "@/components/risk-report";
+import { AddressLookup } from "@/components/address-lookup";
 
 export default function Home() {
-  const { isConnected } = useConnection();
+  const { address: connectedAddress, isConnected } = useConnection();
+  const [manualAddress, setManualAddress] = useState<Address | undefined>();
+
+  const viewAddress = manualAddress ?? (isConnected ? connectedAddress : undefined);
+  const isOwnWallet =
+    isConnected && !!connectedAddress && viewAddress === connectedAddress;
 
   return (
     <div className="flex flex-1 flex-col bg-black text-white">
@@ -23,11 +31,19 @@ export default function Home() {
       </header>
 
       <main className="mx-auto flex w-full max-w-3xl flex-1 flex-col gap-6 px-4 py-8 sm:px-10 sm:py-12">
-        {isConnected ? (
+        <AddressLookup
+          manualAddress={manualAddress}
+          connectedAddress={connectedAddress}
+          isOwnWallet={isOwnWallet}
+          onLookup={setManualAddress}
+          onClear={() => setManualAddress(undefined)}
+        />
+
+        {viewAddress ? (
           <>
-            <WalletDashboard />
-            <SecurityProfileCard />
-            <RiskReport />
+            <WalletDashboard viewAddress={viewAddress} isOwnWallet={isOwnWallet} />
+            <SecurityProfileCard viewAddress={viewAddress} isOwnWallet={isOwnWallet} />
+            <RiskReport viewAddress={viewAddress} isOwnWallet={isOwnWallet} />
           </>
         ) : (
           <LandingHero />

@@ -1,5 +1,6 @@
 "use client";
 
+import type { Address } from "viem";
 import { useScoreRegistry } from "@/hooks/use-score-registry";
 import { useScoreGatedDemo } from "@/hooks/use-score-gated-demo";
 import { MIN_SCORE } from "@/lib/score-gated-demo";
@@ -12,7 +13,15 @@ function formatSecondsAgo(timestamp: bigint): string {
   return `${Math.round(seconds / 86400)}d ago`;
 }
 
-export function OnchainScoreCard({ score }: { score: number }) {
+export function OnchainScoreCard({
+  score,
+  viewAddress,
+  isOwnWallet,
+}: {
+  score: number;
+  viewAddress: Address;
+  isOwnWallet: boolean;
+}) {
   const {
     publishedScore,
     isLoadingPublishedScore,
@@ -20,7 +29,7 @@ export function OnchainScoreCard({ score }: { score: number }) {
     isPublishing,
     isPublished,
     error: publishError,
-  } = useScoreRegistry();
+  } = useScoreRegistry(viewAddress);
 
   const {
     attempt,
@@ -31,7 +40,8 @@ export function OnchainScoreCard({ score }: { score: number }) {
   } = useScoreGatedDemo();
 
   const isStale = !isLoadingPublishedScore && publishedScore?.exists && publishedScore.score !== score;
-  const canPublish = !isLoadingPublishedScore && (!publishedScore?.exists || isStale);
+  const canPublish =
+    isOwnWallet && !isLoadingPublishedScore && (!publishedScore?.exists || isStale);
   const gatedBusy = isGatedPending || isGatedConfirming;
 
   return (
@@ -72,6 +82,11 @@ export function OnchainScoreCard({ score }: { score: number }) {
           </button>
         )}
       </div>
+      {!isOwnWallet && !publishedScore?.exists && !isLoadingPublishedScore && (
+        <p className="mt-2 text-xs text-white/30">
+          Connect this exact wallet to publish its score.
+        </p>
+      )}
       {isPublished && (
         <p className="mt-2 text-xs text-emerald-400">Published on-chain.</p>
       )}
@@ -87,7 +102,7 @@ export function OnchainScoreCard({ score }: { score: number }) {
         </p>
         <button
           onClick={() => attempt()}
-          disabled={gatedBusy}
+          disabled={gatedBusy || !isOwnWallet}
           className="mt-3 rounded-full border border-white/10 px-4 py-2 text-sm font-semibold text-white/80 transition hover:border-monad-purple/50 hover:text-white disabled:opacity-50"
         >
           {isGatedConfirmed
@@ -98,6 +113,12 @@ export function OnchainScoreCard({ score }: { score: number }) {
                 ? "Confirm in wallet..."
                 : "Try gated action"}
         </button>
+        {!isOwnWallet && (
+          <p className="mt-2 text-xs text-white/30">
+            Connect this exact wallet to try the gated action &mdash; it can
+            only be called by the address whose score is being checked.
+          </p>
+        )}
         {isGatedConfirmed && (
           <p className="mt-2 text-xs text-emerald-400">
             Access granted &mdash; verified on-chain against your published

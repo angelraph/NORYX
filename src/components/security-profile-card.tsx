@@ -1,9 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { useConnection } from "wagmi";
+import type { Address } from "viem";
 import { useSecurityProfile, type SecurityProfile } from "@/hooks/use-security-profile";
-import { monad } from "@/lib/chains";
 
 function ProfileForm({
   initialProfile,
@@ -85,26 +84,45 @@ function ProfileForm({
   );
 }
 
-export function SecurityProfileCard() {
-  const { isConnected, chainId } = useConnection();
-  const { profile, isLoadingProfile, save, isSaving, isSaved, error } =
-    useSecurityProfile();
+function ProfileSummary({ profile }: { profile: SecurityProfile | undefined }) {
+  if (!profile?.exists) {
+    return <p className="mt-4 text-sm text-white/40">No saved policy for this wallet.</p>;
+  }
+  return (
+    <ul className="mt-4 flex flex-col gap-1.5 text-sm text-white/70">
+      <li>
+        Unlimited approvals: {profile.blockUnlimitedApprovals ? "flagged" : "not flagged"}
+      </li>
+      <li>Max approval amount: {profile.maxApprovalAmount.toString()}</li>
+      <li>New contracts: {profile.warnNewContracts ? "flagged" : "not flagged"}</li>
+    </ul>
+  );
+}
 
-  if (!isConnected || chainId !== monad.id) return null;
+export function SecurityProfileCard({
+  viewAddress,
+  isOwnWallet,
+}: {
+  viewAddress: Address;
+  isOwnWallet: boolean;
+}) {
+  const { profile, isLoadingProfile, save, isSaving, isSaved, error } =
+    useSecurityProfile(viewAddress);
 
   return (
     <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-6">
       <p className="font-display text-sm font-medium text-white">
-        Your Security Profile
+        {isOwnWallet ? "Your Security Profile" : "Security Profile"}
       </p>
       <p className="mt-1 text-xs text-white/40">
-        Saved on-chain in the SecurityProfile contract, checked against every
-        scan below.
+        {isOwnWallet
+          ? "Saved on-chain in the SecurityProfile contract, checked against every scan below."
+          : "Read-only: this wallet's saved policy. Connect it to edit."}
       </p>
 
       {isLoadingProfile ? (
-        <p className="mt-4 text-sm text-white/40">Loading your saved preferences...</p>
-      ) : (
+        <p className="mt-4 text-sm text-white/40">Loading saved preferences...</p>
+      ) : isOwnWallet ? (
         <ProfileForm
           initialProfile={profile}
           save={save}
@@ -112,6 +130,8 @@ export function SecurityProfileCard() {
           isSaved={isSaved}
           error={error}
         />
+      ) : (
+        <ProfileSummary profile={profile} />
       )}
     </div>
   );
