@@ -74,6 +74,16 @@ This is not a data-availability trick; the ScoreRegistry attestation is
 enforced with real `require()` checks on-chain, verifiable independent
 of Noryx's frontend.
 
+## 4b. Why Noryx, not a generic "explain any transaction" tool
+
+A different objection: "Blockaid / Wallet Guard / Rabby already warn me
+before I sign anything." Those tools try to explain *every* transaction
+type generically — broad but shallow. Noryx narrows to the single
+highest-value, best-understood attack surface, **token approvals** (the
+actual mechanism behind most wallet-drainer stories), and does that one
+thing with real on-chain data end to end, rather than a shallow pass
+across everything.
+
 ## 5. Live demo script (~2–3 minutes)
 
 Have two wallets ready ahead of time: **Wallet A** with some real
