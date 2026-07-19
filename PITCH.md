@@ -124,6 +124,23 @@ on 2026-07-18.
    mint, an allowlist, a lending term, on a wallet's Noryx score,
    without ever talking to us."
 
+## 5b. Second clip script: read-only lookup (~20 seconds)
+
+A short standalone clip for the read-only lookup, separate from the main
+demo above — good as a second post or a reply with more depth. Record in
+a private/incognito window so nothing auto-connects. Confirmed working
+end-to-end on 2026-07-19.
+
+1. Load the app with no wallet connected. "No wallet, no connection —
+   watch this."
+2. Paste in any address, hit **View**. "That's a live scan of a wallet I
+   don't even own — real approvals, real balance, straight off Monad
+   Mainnet. No gas, no signup."
+3. Point at a disabled action (Revoke shows "Read-only", or the score
+   card's "Connect this wallet to publish its score"). "Read-only where
+   it should be — I can look at anything, but I can't act unless it's
+   actually my wallet signing."
+
 ## 6. Anticipated questions
 
 - **"Isn't this just an oracle for your own number?"** — Yes, and that's
