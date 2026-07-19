@@ -95,6 +95,9 @@ attestation on every scan is cheap enough to actually do.
   `ScoreGatedDemo.sol`), compiled with `solc` and deployed with plain viem
   scripts (no Foundry/Hardhat dependency)
 - Monad Mainnet (chain ID `143`)
+- Space Grotesk + Roboto Mono, matching Monad's brand kit — the kit's
+  documented swatch and its live logomark's actual fill color disagree,
+  we matched the live logo (`#836EF9`)
 
 ## How the approval scan actually works
 
@@ -113,6 +116,14 @@ revoked since), so only the current on-chain state is trusted.
 Tracked tokens (USDC, WETH, WMON) are sourced from Monad's official
 token list and independently confirmed live via `eth_getCode` — see
 `src/lib/tokens.ts`.
+
+Every block-count constant in the scan (`FAST_PASS_BLOCKS` and friends in
+`use-approval-scan.ts`, `BLOCK_TIME_SECONDS` in `src/lib/risk.ts`) is
+calibrated against Monad Mainnet's real block time, ~0.4s, measured
+directly from consecutive block timestamps rather than assumed from
+testnet's ~1s. Getting this wrong doesn't throw an error, it just silently
+drifts — scan windows cover the wrong wall-clock range and "deployed X
+ago" labels quietly become inaccurate.
 
 ## How the contract-risk checks work
 
