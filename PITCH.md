@@ -178,3 +178,20 @@ end-to-end on 2026-07-19.
 
 See `README.md` for full technical detail on the approval-scan
 mechanics, contract-risk checks, and rate-limit handling.
+
+## 8. What I learned (slide)
+
+Testnet assumptions don't carry over to mainnet even when the RPC
+interface looks identical. I had to empirically re-measure Monad
+Mainnet's real block time (~0.4s, not testnet's ~1s) and its
+`eth_getCode` historical-state retention window (~1,928,000 blocks, not
+testnet's ~5M — see [How the contract-risk checks
+work](./README.md#how-the-contract-risk-checks-work)), then recalibrate
+every block-count constant in the scan logic so scan windows and
+"deployed X ago" labels stayed accurate on the new chain instead of
+silently drifting.
+
+Also found Monad's own brand kit inconsistent between its documented
+swatch and its live logo's actual fill color — worth verifying brand
+assets the same way you'd verify anything else (see `bee907a` /
+`807f288`).
